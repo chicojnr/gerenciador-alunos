@@ -1,7 +1,11 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 
-const NAV_ITEMS = [{ to: "/escolas", label: "Escolas" }];
+const NAV_ITEMS = [
+  { to: "/escolas", label: "Escolas" },
+  { to: "/periodos", label: "Períodos" },
+  { to: "/materias", label: "Matérias" }
+];
 
 export function Layout() {
   const location = useLocation();
