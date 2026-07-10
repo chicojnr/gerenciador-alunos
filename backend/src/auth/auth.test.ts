@@ -17,7 +17,11 @@ describe("auth routes", () => {
   });
 
   beforeEach(async () => {
-    await prisma.user.deleteMany();
+    await prisma.user.deleteMany({
+      where: {
+        email: { in: ["admin@example.com", "routes-test@example.com", "no-such-user@example.com"] }
+      }
+    });
     await prisma.user.create({
       data: {
         email: "admin@example.com",
