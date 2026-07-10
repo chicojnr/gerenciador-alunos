@@ -11,13 +11,19 @@ async function main() {
 
   const passwordHash = await hashPassword(password);
 
+  const existing = await prisma.user.findUnique({ where: { email } });
+
   await prisma.user.upsert({
     where: { email },
     update: {},
     create: { email, passwordHash, name: "Admin" }
   });
 
-  console.log(`Seeded admin user: ${email}`);
+  if (existing) {
+    console.log(`Admin user already exists, password left unchanged: ${email}`);
+  } else {
+    console.log(`Seeded admin user: ${email}`);
+  }
 }
 
 main()
