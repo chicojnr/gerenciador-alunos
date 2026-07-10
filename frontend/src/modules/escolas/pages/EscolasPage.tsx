@@ -12,7 +12,7 @@ export function EscolasPage() {
   const [editing, setEditing] = useState<Escola | null>(null);
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return <p className="text-zinc-500">Carregando...</p>;
   }
 
   function openCreate() {
@@ -36,8 +36,10 @@ export function EscolasPage() {
 
   return (
     <div>
-      <h1>Escolas</h1>
-      <Button onClick={openCreate}>Nova Escola</Button>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-semibold text-zinc-900">Escolas</h1>
+        <Button onClick={openCreate}>Nova Escola</Button>
+      </div>
       <EscolaList escolas={escolas} onEdit={openEdit} onRemove={remove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <EscolaForm

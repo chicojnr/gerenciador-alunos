@@ -10,18 +10,26 @@ interface EscolaListProps {
 
 export function EscolaList({ escolas, onEdit, onRemove }: EscolaListProps) {
   return (
-    <div>
-      <Table<Escola>
-        columns={[{ key: "nome", header: "Nome" }]}
-        rows={escolas}
-        rowKey={(e) => e.id}
-      />
-      {escolas.map((e) => (
-        <div key={e.id}>
-          <Button onClick={() => onEdit(e)}>Editar</Button>
-          <Button onClick={() => onRemove(e.id)}>Remover</Button>
-        </div>
-      ))}
-    </div>
+    <Table<Escola>
+      columns={[
+        { key: "nome", header: "Nome" },
+        {
+          key: "acoes",
+          header: "Ações",
+          render: (escola) => (
+            <div className="flex gap-2">
+              <Button variant="secondary" onClick={() => onEdit(escola)}>
+                Editar
+              </Button>
+              <Button variant="danger" onClick={() => onRemove(escola.id)}>
+                Remover
+              </Button>
+            </div>
+          )
+        }
+      ]}
+      rows={escolas}
+      rowKey={(e) => e.id}
+    />
   );
 }
