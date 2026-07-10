@@ -1,0 +1,45 @@
+import type { FastifyInstance } from "fastify";
+import { login, InvalidCredentialsError } from "./auth.service.js";
+import { signAccessToken, verifyToken } from "../core/jwt.js";
+import type { Config } from "../core/config.js";
+import type { LoginBody } from "./auth.types.js";
+
+const COOKIE_OPTS = { httpOnly: true, path: "/", sameSite: "lax" as const };
+
+export function registerAuthRoutes(app: FastifyInstance, config: Config) {
+  app.post<{ Body: LoginBody }>("/auth/login", async (request, reply) => {
+    try {
+      const { email, password } = request.body;
+      const result = await login(email, password, config);
+      reply.setCookie("access_token", result.accessToken, COOKIE_OPTS);
+      reply.setCookie("refresh_token", result.refreshToken, COOKIE_OPTS);
+      return { userId: result.userId };
+    } catch (err) {
+      if (err instanceof InvalidCredentialsError) {
+        return reply.code(401).send({ error: "Invalid credentials" });
+      }
+      throw err;
+    }
+  });
+
+  app.post("/auth/refresh", async (request, reply) => {
+    const refreshToken = request.cookies.refresh_token;
+    if (!refreshToken) {
+      return reply.code(401).send({ error: "Unauthorized" });
+    }
+    try {
+      const payload = verifyToken(refreshToken, config.jwtRefreshSecret);
+      const accessToken = signAccessToken(payload.userId, config.jwtAccessSecret);
+      reply.setCookie("access_token", accessToken, COOKIE_OPTS);
+      return { ok: true };
+    } catch {
+      return reply.code(401).send({ error: "Unauthorized" });
+    }
+  });
+
+  app.post("/auth/logout", async (_request, reply) => {
+    reply.clearCookie("access_token", { path: "/" });
+    reply.clearCookie("refresh_token", { path: "/" });
+    return { ok: true };
+  });
+}
