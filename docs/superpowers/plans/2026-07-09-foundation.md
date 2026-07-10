@@ -1088,7 +1088,7 @@ export const escolaService = {
     return escola;
   },
 
-  create(data: CreateEscolaInput) {
+  async create(data: CreateEscolaInput) {
     assertValidNome(data.nome);
     return escolaRepository.create(data);
   },
