@@ -15,7 +15,7 @@ function required(name: string): string {
 
 export function loadConfig(): Config {
   return {
-    port: Number(process.env.PORT ?? 3000),
+    port: Number(process.env.PORT ?? 3001),
     databaseUrl: required("DATABASE_URL"),
     jwtAccessSecret: required("JWT_ACCESS_SECRET"),
     jwtRefreshSecret: required("JWT_REFRESH_SECRET")
