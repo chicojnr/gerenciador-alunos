@@ -49,4 +49,14 @@ describe("auth routes", () => {
 
     expect(response.statusCode).toBe(401);
   });
+
+  it("rejects non-existent email", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: "no-such-user@example.com", password: "wrong" }
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
 });
