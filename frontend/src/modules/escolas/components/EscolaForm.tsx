@@ -10,12 +10,18 @@ interface EscolaFormProps {
 
 export function EscolaForm({ initial, submitLabel, onSubmit }: EscolaFormProps) {
   const [nome, setNome] = useState(initial?.nome ?? "");
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    await onSubmit({ nome });
-    if (!initial) {
-      setNome("");
+    setError(null);
+    try {
+      await onSubmit({ nome });
+      if (!initial) {
+        setNome("");
+      }
+    } catch {
+      setError("Não foi possível salvar a escola. Tente novamente.");
     }
   }
 
@@ -27,6 +33,7 @@ export function EscolaForm({ initial, submitLabel, onSubmit }: EscolaFormProps) 
         placeholder="Nome da escola"
       />
       <Button type="submit">{submitLabel}</Button>
+      {error && <p role="alert">{error}</p>}
     </form>
   );
 }
