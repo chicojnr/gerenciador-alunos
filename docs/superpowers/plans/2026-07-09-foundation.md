@@ -27,7 +27,7 @@ GerenciadorAlunos/
 ├── package.json                      # root workspace scripts
 ├── pnpm-workspace.yaml
 ├── tsconfig.base.json
-├── .eslintrc.cjs
+├── eslint.config.js
 ├── .prettierrc
 ├── .gitignore
 ├── docker-compose.yml                # Postgres for dev + tests
@@ -101,7 +101,7 @@ GerenciadorAlunos/
 - Create: `package.json`
 - Create: `pnpm-workspace.yaml`
 - Create: `tsconfig.base.json`
-- Create: `.eslintrc.cjs`
+- Create: `eslint.config.js`
 - Create: `.prettierrc`
 - Create: `.gitignore`
 - Create: `docker-compose.yml`
@@ -123,6 +123,7 @@ packages:
 {
   "name": "gerenciador-alunos",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "pnpm -r --parallel run dev",
     "build": "pnpm -r run build",
@@ -130,9 +131,12 @@ packages:
     "lint": "pnpm -r run lint"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.0",
     "eslint": "^9.9.0",
+    "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.3.3",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.3.0"
   }
 }
 ```
@@ -156,22 +160,29 @@ packages:
 }
 ```
 
-- [ ] **Step 4: Create `.eslintrc.cjs`**
+- [ ] **Step 4: Create `eslint.config.js`**
+
+ESLint 9 uses flat config by default and will not read `.eslintrc.cjs` — use the flat-config equivalent instead.
 
 ```js
-module.exports = {
-  root: true,
-  parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint"],
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "prettier"
-  ],
-  env: { node: true, es2022: true },
-  parserOptions: { ecmaVersion: 2022, sourceType: "module" },
-  rules: {}
-};
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import prettier from "eslint-config-prettier";
+
+export default tseslint.config(
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  prettier,
+  {
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module"
+    }
+  },
+  {
+    ignores: ["**/dist/**", "**/node_modules/**"]
+  }
+);
 ```
 
 - [ ] **Step 5: Create `.prettierrc`**
@@ -223,7 +234,7 @@ Expected: completes without error (no packages yet besides root devDependencies)
 - [ ] **Step 9: Commit**
 
 ```bash
-git add package.json pnpm-workspace.yaml tsconfig.base.json .eslintrc.cjs .prettierrc .gitignore docker-compose.yml
+git add package.json pnpm-workspace.yaml tsconfig.base.json eslint.config.js .prettierrc .gitignore docker-compose.yml
 git commit -m "chore: scaffold monorepo workspace, tooling config, postgres compose"
 ```
 
