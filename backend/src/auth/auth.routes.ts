@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { login, InvalidCredentialsError } from "./auth.service.js";
 import { signAccessToken, verifyToken } from "../core/jwt.js";
 import { requireAuth } from "../core/auth-hook.js";
+import { prisma } from "../core/prisma.js";
 import type { Config } from "../core/config.js";
 import type { LoginBody } from "./auth.types.js";
 
@@ -9,7 +10,7 @@ const COOKIE_OPTS = { httpOnly: true, path: "/", sameSite: "lax" as const };
 
 export function registerAuthRoutes(app: FastifyInstance, config: Config) {
   app.get("/auth/me", { preHandler: requireAuth(config) }, async (request) => {
-    return { userId: request.user!.id };
+    return { userId: request.user!.id, role: request.user!.role };
   });
 
   app.post<{ Body: LoginBody }>("/auth/login", async (request, reply) => {
@@ -18,7 +19,7 @@ export function registerAuthRoutes(app: FastifyInstance, config: Config) {
       const result = await login(email, password, config);
       reply.setCookie("access_token", result.accessToken, COOKIE_OPTS);
       reply.setCookie("refresh_token", result.refreshToken, COOKIE_OPTS);
-      return { userId: result.userId };
+      return { userId: result.userId, role: result.role };
     } catch (err) {
       if (err instanceof InvalidCredentialsError) {
         return reply.code(401).send({ error: "Invalid credentials" });
@@ -34,7 +35,11 @@ export function registerAuthRoutes(app: FastifyInstance, config: Config) {
     }
     try {
       const payload = verifyToken(refreshToken, config.jwtRefreshSecret);
-      const accessToken = signAccessToken(payload.userId, config.jwtAccessSecret);
+      const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+      if (!user || !user.ativo) {
+        return reply.code(401).send({ error: "Unauthorized" });
+      }
+      const accessToken = signAccessToken(user.id, user.role, config.jwtAccessSecret);
       reply.setCookie("access_token", accessToken, COOKIE_OPTS);
       return { ok: true };
     } catch {

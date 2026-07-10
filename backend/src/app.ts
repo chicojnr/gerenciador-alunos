@@ -6,6 +6,7 @@ import { registerAuthRoutes } from "./auth/auth.routes.js";
 import { registerEscolasRoutes } from "./modules/escolas/escolas.routes.js";
 import { registerPeriodosRoutes } from "./modules/periodos/periodos.routes.js";
 import { registerMateriasRoutes } from "./modules/materias/materias.routes.js";
+import { registerUsuariosRoutes } from "./modules/usuarios/usuarios.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
@@ -20,6 +21,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerEscolasRoutes(app, config);
   registerPeriodosRoutes(app, config);
   registerMateriasRoutes(app, config);
+  registerUsuariosRoutes(app, config);
 
   return app;
 }

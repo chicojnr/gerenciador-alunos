@@ -14,13 +14,14 @@ export async function login(email: string, password: string, config: Config) {
 
   const valid = await comparePassword(password, user?.passwordHash ?? DUMMY_HASH);
 
-  if (!user || !valid) {
+  if (!user || !valid || !user.ativo) {
     throw new InvalidCredentialsError();
   }
 
   return {
     userId: user.id,
-    accessToken: signAccessToken(user.id, config.jwtAccessSecret),
+    role: user.role,
+    accessToken: signAccessToken(user.id, user.role, config.jwtAccessSecret),
     refreshToken: signRefreshToken(user.id, config.jwtRefreshSecret)
   };
 }

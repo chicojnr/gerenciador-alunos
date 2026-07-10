@@ -1,3 +1,5 @@
+import type { Role } from "@prisma/client";
+
 export interface LoginBody {
   email: string;
   password: string;
@@ -5,6 +7,6 @@ export interface LoginBody {
 
 declare module "fastify" {
   interface FastifyRequest {
-    user?: { id: string };
+    user?: { id: string; role: Role };
   }
 }

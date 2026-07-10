@@ -9,20 +9,34 @@ import { hashPassword } from "../../core/password.js";
 describe("escolas routes", () => {
   let app: FastifyInstance;
   let authCookie: string;
+  let nonAdminCookie: string;
 
   beforeAll(async () => {
     app = await buildApp();
     const config = loadConfig();
-    const user = await prisma.user.upsert({
+    const admin = await prisma.user.upsert({
       where: { email: "routes-test@example.com" },
-      update: {},
+      update: { role: "ADMIN" },
       create: {
         email: "routes-test@example.com",
         passwordHash: await hashPassword("x"),
-        name: "Tester"
+        name: "Tester",
+        role: "ADMIN"
       }
     });
-    authCookie = `access_token=${signAccessToken(user.id, config.jwtAccessSecret)}`;
+    authCookie = `access_token=${signAccessToken(admin.id, admin.role, config.jwtAccessSecret)}`;
+
+    const nonAdmin = await prisma.user.upsert({
+      where: { email: "routes-test-user@example.com" },
+      update: { role: "USER" },
+      create: {
+        email: "routes-test-user@example.com",
+        passwordHash: await hashPassword("x"),
+        name: "Non-Admin Tester",
+        role: "USER"
+      }
+    });
+    nonAdminCookie = `access_token=${signAccessToken(nonAdmin.id, nonAdmin.role, config.jwtAccessSecret)}`;
   });
 
   beforeEach(async () => {
@@ -37,6 +51,15 @@ describe("escolas routes", () => {
   it("rejects unauthenticated requests", async () => {
     const response = await app.inject({ method: "GET", url: "/escolas" });
     expect(response.statusCode).toBe(401);
+  });
+
+  it("rejects non-admin requests", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/escolas",
+      headers: { cookie: nonAdminCookie }
+    });
+    expect(response.statusCode).toBe(403);
   });
 
   it("creates then lists an escola", async () => {

@@ -1,11 +1,14 @@
 import jwt from "jsonwebtoken";
 
+export type JwtRole = "ADMIN" | "USER";
+
 export interface TokenPayload {
   userId: string;
+  role?: JwtRole;
 }
 
-export function signAccessToken(userId: string, secret: string): string {
-  return jwt.sign({ userId }, secret, { expiresIn: "15m" });
+export function signAccessToken(userId: string, role: JwtRole, secret: string): string {
+  return jwt.sign({ userId, role }, secret, { expiresIn: "15m" });
 }
 
 export function signRefreshToken(userId: string, secret: string): string {
@@ -17,5 +20,8 @@ export function verifyToken(token: string, secret: string): TokenPayload {
   if (typeof decoded === "string" || !("userId" in decoded)) {
     throw new Error("Invalid token payload");
   }
-  return { userId: decoded.userId as string };
+  return {
+    userId: decoded.userId as string,
+    role: "role" in decoded ? (decoded.role as JwtRole) : undefined
+  };
 }

@@ -1,11 +1,11 @@
 import type { FastifyInstance } from "fastify";
 import { escolaService, EscolaNotFoundError, EscolaValidationError } from "./escolas.service.js";
-import { requireAuth } from "../../core/auth-hook.js";
+import { requireAuth, requireRole } from "../../core/auth-hook.js";
 import type { Config } from "../../core/config.js";
 import type { CreateEscolaInput, UpdateEscolaInput } from "./escolas.types.js";
 
 export function registerEscolasRoutes(app: FastifyInstance, config: Config) {
-  const auth = { preHandler: requireAuth(config) };
+  const auth = { preHandler: [requireAuth(config), requireRole("ADMIN")] };
 
   app.get<{ Querystring: { page?: string; pageSize?: string } }>(
     "/escolas",

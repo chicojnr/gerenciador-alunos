@@ -22,7 +22,7 @@ describe("materias routes", () => {
         name: "Tester"
       }
     });
-    authCookie = `access_token=${signAccessToken(user.id, config.jwtAccessSecret)}`;
+    authCookie = `access_token=${signAccessToken(user.id, user.role, config.jwtAccessSecret)}`;
   });
 
   beforeEach(async () => {

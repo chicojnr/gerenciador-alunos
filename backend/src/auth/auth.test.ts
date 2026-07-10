@@ -80,11 +80,48 @@ describe("auth routes", () => {
     });
 
     expect(response.statusCode).toBe(200);
-    expect(response.json()).toEqual({ userId: admin.id });
+    expect(response.json()).toEqual({ userId: admin.id, role: "USER" });
   });
 
   it("rejects an unauthenticated request to /auth/me", async () => {
     const response = await app.inject({ method: "GET", url: "/auth/me" });
+    expect(response.statusCode).toBe(401);
+  });
+
+  it("rejects login for a deactivated user", async () => {
+    await prisma.user.update({
+      where: { email: "admin@example.com" },
+      data: { ativo: false }
+    });
+
+    const response = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: "admin@example.com", password: "correct-password" }
+    });
+
+    expect(response.statusCode).toBe(401);
+  });
+
+  it("rejects /auth/me for a token whose user was deactivated after login", async () => {
+    const loginResponse = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: "admin@example.com", password: "correct-password" }
+    });
+    const accessCookie = loginResponse.cookies.find((c) => c.name === "access_token")!;
+
+    await prisma.user.update({
+      where: { email: "admin@example.com" },
+      data: { ativo: false }
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/auth/me",
+      headers: { cookie: `access_token=${accessCookie.value}` }
+    });
+
     expect(response.statusCode).toBe(401);
   });
 });
