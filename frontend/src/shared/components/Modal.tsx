@@ -12,11 +12,19 @@ export function Modal({ open, onClose, children }: ModalProps) {
   }
 
   return (
-    <div role="dialog" aria-modal="true">
-      <button aria-label="Fechar" onClick={onClose}>
-        ×
-      </button>
-      {children}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div role="dialog" aria-modal="true" className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <div className="mb-2 flex justify-end">
+          <button
+            aria-label="Fechar"
+            onClick={onClose}
+            className="text-zinc-400 hover:text-zinc-600"
+          >
+            ×
+          </button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }
