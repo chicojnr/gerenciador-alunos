@@ -25,3 +25,19 @@ model Escola {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Periodo {
+  id        String   @id @default(uuid())
+  nome      String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Materia {
+  id        String   @id @default(uuid())
+  nome      String   @unique
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
