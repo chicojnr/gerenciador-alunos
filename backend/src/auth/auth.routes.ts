@@ -1,12 +1,17 @@
 import type { FastifyInstance } from "fastify";
 import { login, InvalidCredentialsError } from "./auth.service.js";
 import { signAccessToken, verifyToken } from "../core/jwt.js";
+import { requireAuth } from "../core/auth-hook.js";
 import type { Config } from "../core/config.js";
 import type { LoginBody } from "./auth.types.js";
 
 const COOKIE_OPTS = { httpOnly: true, path: "/", sameSite: "lax" as const };
 
 export function registerAuthRoutes(app: FastifyInstance, config: Config) {
+  app.get("/auth/me", { preHandler: requireAuth(config) }, async (request) => {
+    return { userId: request.user!.id };
+  });
+
   app.post<{ Body: LoginBody }>("/auth/login", async (request, reply) => {
     try {
       const { email, password } = request.body;

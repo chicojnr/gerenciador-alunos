@@ -7,5 +7,6 @@ export interface LoginResponse {
 export const authService = {
   login: (email: string, password: string) =>
     apiClient.post<LoginResponse>("/auth/login", { email, password }),
-  logout: () => apiClient.post<{ ok: boolean }>("/auth/logout", {})
+  logout: () => apiClient.post<{ ok: boolean }>("/auth/logout", {}),
+  me: () => apiClient.get<LoginResponse>("/auth/me")
 };

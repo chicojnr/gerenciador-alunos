@@ -63,4 +63,28 @@ describe("auth routes", () => {
 
     expect(response.statusCode).toBe(401);
   });
+
+  it("returns the current user id for an authenticated request", async () => {
+    const loginResponse = await app.inject({
+      method: "POST",
+      url: "/auth/login",
+      payload: { email: "admin@example.com", password: "correct-password" }
+    });
+    const admin = await prisma.user.findUniqueOrThrow({ where: { email: "admin@example.com" } });
+    const accessCookie = loginResponse.cookies.find((c) => c.name === "access_token")!;
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/auth/me",
+      headers: { cookie: `access_token=${accessCookie.value}` }
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(response.json()).toEqual({ userId: admin.id });
+  });
+
+  it("rejects an unauthenticated request to /auth/me", async () => {
+    const response = await app.inject({ method: "GET", url: "/auth/me" });
+    expect(response.statusCode).toBe(401);
+  });
 });
