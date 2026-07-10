@@ -1,8 +1,10 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { authService } from "./auth.service.js";
+import type { Role } from "./auth.service.js";
 
 interface AuthUser {
   id: string;
+  role: Role;
 }
 
 interface AuthContextValue {
@@ -25,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .me()
       .then((result) => {
         if (!cancelled) {
-          setUser({ id: result.userId });
+          setUser({ id: result.userId, role: result.role });
         }
       })
       .catch(() => {
@@ -44,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     const result = await authService.login(email, password);
-    setUser({ id: result.userId });
+    setUser({ id: result.userId, role: result.role });
   }
 
   async function logout() {

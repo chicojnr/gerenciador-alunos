@@ -2,9 +2,11 @@ import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "./core/Layout.js";
 import { LoginPage } from "./auth/LoginPage.js";
 import { RouteGuard } from "./auth/RouteGuard.js";
+import { AdminRoute } from "./auth/AdminRoute.js";
 import { EscolasPage } from "./modules/escolas/pages/EscolasPage.js";
 import { PeriodosPage } from "./modules/periodos/pages/PeriodosPage.js";
 import { MateriasPage } from "./modules/materias/pages/MateriasPage.js";
+import { UsuariosPage } from "./modules/usuarios/pages/UsuariosPage.js";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -16,9 +18,24 @@ export const router = createBrowserRouter([
       </RouteGuard>
     ),
     children: [
-      { path: "escolas", element: <EscolasPage /> },
+      {
+        path: "escolas",
+        element: (
+          <AdminRoute>
+            <EscolasPage />
+          </AdminRoute>
+        )
+      },
       { path: "periodos", element: <PeriodosPage /> },
-      { path: "materias", element: <MateriasPage /> }
+      { path: "materias", element: <MateriasPage /> },
+      {
+        path: "usuarios",
+        element: (
+          <AdminRoute>
+            <UsuariosPage />
+          </AdminRoute>
+        )
+      }
     ]
   }
 ]);

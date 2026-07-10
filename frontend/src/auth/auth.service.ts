@@ -1,7 +1,10 @@
 import { apiClient } from "../core/apiClient.js";
 
+export type Role = "ADMIN" | "USER";
+
 export interface LoginResponse {
   userId: string;
+  role: Role;
 }
 
 export const authService = {

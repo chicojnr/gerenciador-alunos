@@ -2,21 +2,23 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 
 const NAV_ITEMS = [
-  { to: "/escolas", label: "Escolas" },
-  { to: "/periodos", label: "Períodos" },
-  { to: "/materias", label: "Matérias" }
+  { to: "/escolas", label: "Escolas", adminOnly: true },
+  { to: "/periodos", label: "Períodos", adminOnly: false },
+  { to: "/materias", label: "Matérias", adminOnly: false },
+  { to: "/usuarios", label: "Usuários", adminOnly: true }
 ];
 
 export function Layout() {
   const location = useLocation();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
+  const visibleItems = NAV_ITEMS.filter((item) => !item.adminOnly || user?.role === "ADMIN");
 
   return (
     <div className="flex min-h-screen bg-zinc-50">
       <aside className="flex w-60 flex-col bg-zinc-900 text-zinc-400">
         <div className="px-4 py-5 text-lg font-semibold text-white">GerenciadorAlunos</div>
         <nav className="flex-1 space-y-1 px-2">
-          {NAV_ITEMS.map((item) => {
+          {visibleItems.map((item) => {
             const active = location.pathname.startsWith(item.to);
             return (
               <Link
