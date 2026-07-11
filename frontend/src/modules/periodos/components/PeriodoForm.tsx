@@ -20,8 +20,8 @@ export function PeriodoForm({ initial, submitLabel, onSubmit }: PeriodoFormProps
       if (!initial) {
         setNome("");
       }
-    } catch {
-      setError("Não foi possível salvar o período. Tente novamente.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível salvar o período.");
     }
   }
 

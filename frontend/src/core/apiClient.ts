@@ -11,6 +11,18 @@ async function refreshAccessToken(): Promise<boolean> {
   return response.ok;
 }
 
+async function errorFromResponse(response: Response): Promise<Error> {
+  try {
+    const body = (await response.clone().json()) as { error?: string };
+    if (body.error) {
+      return new Error(body.error);
+    }
+  } catch {
+    // Response body wasn't JSON (or was empty) — fall back to a generic message.
+  }
+  return new Error(`Request failed: ${response.status}`);
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
@@ -28,12 +40,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
           headers: { "Content-Type": "application/json", ...options.headers }
         });
         if (!retryResponse.ok) {
-          throw new Error(`Request failed: ${retryResponse.status}`);
+          throw await errorFromResponse(retryResponse);
         }
         return retryResponse.json() as Promise<T>;
       }
     }
-    throw new Error(`Request failed: ${response.status}`);
+    throw await errorFromResponse(response);
   }
 
   return response.json() as Promise<T>;

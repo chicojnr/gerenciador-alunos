@@ -20,8 +20,8 @@ export function MateriaForm({ initial, submitLabel, onSubmit }: MateriaFormProps
       if (!initial) {
         setNome("");
       }
-    } catch {
-      setError("Não foi possível salvar a matéria. Tente novamente.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível salvar a matéria.");
     }
   }
 

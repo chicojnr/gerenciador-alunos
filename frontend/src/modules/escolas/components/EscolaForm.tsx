@@ -20,8 +20,8 @@ export function EscolaForm({ initial, submitLabel, onSubmit }: EscolaFormProps) 
       if (!initial) {
         setNome("");
       }
-    } catch {
-      setError("Não foi possível salvar a escola. Tente novamente.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível salvar a escola.");
     }
   }
 

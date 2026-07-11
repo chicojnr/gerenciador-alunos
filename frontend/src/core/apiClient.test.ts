@@ -17,4 +17,21 @@ describe("apiClient", () => {
       expect.objectContaining({ credentials: "include", method: "GET" })
     );
   });
+
+  it("throws the backend's error message on a non-2xx JSON response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(
+        async () => new Response(JSON.stringify({ error: "email already in use" }), { status: 400 })
+      )
+    );
+
+    await expect(apiClient.post("/usuarios", {})).rejects.toThrow("email already in use");
+  });
+
+  it("falls back to a generic message when the error response has no body", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(null, { status: 500 })));
+
+    await expect(apiClient.post("/usuarios", {})).rejects.toThrow("Request failed: 500");
+  });
 });

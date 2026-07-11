@@ -32,8 +32,8 @@ export function UsuarioForm({ mode, initial, submitLabel, onSubmit }: UsuarioFor
       } else {
         await onSubmit({ name, role });
       }
-    } catch {
-      setError("Não foi possível salvar o usuário. Tente novamente.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível salvar o usuário.");
     }
   }
 
