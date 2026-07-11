@@ -23,14 +23,16 @@ model User {
 }
 
 model Escola {
-  id        String   @id @default(uuid())
-  nome      String
-  cnpj      String?  @unique
-  endereco  String?
-  telefone  String?
-  ativo     Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String      @id @default(uuid())
+  nome       String
+  cnpj       String?     @unique
+  endereco   String?
+  telefone   String?
+  ativo      Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  professores Professor[]
+  turmas     Turma[]
 }
 
 model Periodo {
@@ -39,12 +41,54 @@ model Periodo {
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  turmas    Turma[]
 }
 
 model Materia {
-  id        String   @id @default(uuid())
-  nome      String   @unique
-  ativo     Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String         @id @default(uuid())
+  nome          String         @unique
+  ativo         Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  turmaMaterias TurmaMateria[]
+}
+
+model Professor {
+  id            String         @id @default(uuid())
+  nome          String
+  email         String?
+  telefone      String?
+  escolaId      String
+  escola        Escola         @relation(fields: [escolaId], references: [id])
+  ativo         Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  turmaMaterias TurmaMateria[]
+}
+
+model Turma {
+  id            String         @id @default(uuid())
+  nome          String
+  serie         String
+  escolaId      String
+  escola        Escola         @relation(fields: [escolaId], references: [id])
+  periodoId     String
+  periodo       Periodo        @relation(fields: [periodoId], references: [id])
+  ativo         Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  turmaMaterias TurmaMateria[]
+}
+
+model TurmaMateria {
+  id          String    @id @default(uuid())
+  turmaId     String
+  turma       Turma     @relation(fields: [turmaId], references: [id])
+  materiaId   String
+  materia     Materia   @relation(fields: [materiaId], references: [id])
+  professorId String
+  professor   Professor @relation(fields: [professorId], references: [id])
+  createdAt   DateTime  @default(now())
+
+  @@unique([turmaId, materiaId])
 }
