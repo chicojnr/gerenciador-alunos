@@ -7,6 +7,6 @@ export interface LoginBody {
 
 declare module "fastify" {
   interface FastifyRequest {
-    user?: { id: string; role: Role };
+    user?: { id: string; role: Role; email: string; name: string };
   }
 }

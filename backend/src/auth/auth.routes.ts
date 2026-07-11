@@ -10,7 +10,12 @@ const COOKIE_OPTS = { httpOnly: true, path: "/", sameSite: "lax" as const };
 
 export function registerAuthRoutes(app: FastifyInstance, config: Config) {
   app.get("/auth/me", { preHandler: requireAuth(config) }, async (request) => {
-    return { userId: request.user!.id, role: request.user!.role };
+    return {
+      userId: request.user!.id,
+      role: request.user!.role,
+      email: request.user!.email,
+      name: request.user!.name
+    };
   });
 
   app.post<{ Body: LoginBody }>("/auth/login", async (request, reply) => {
@@ -19,7 +24,7 @@ export function registerAuthRoutes(app: FastifyInstance, config: Config) {
       const result = await login(email, password, config);
       reply.setCookie("access_token", result.accessToken, COOKIE_OPTS);
       reply.setCookie("refresh_token", result.refreshToken, COOKIE_OPTS);
-      return { userId: result.userId, role: result.role };
+      return { userId: result.userId, role: result.role, email: result.email, name: result.name };
     } catch (err) {
       if (err instanceof InvalidCredentialsError) {
         return reply.code(401).send({ error: "Invalid credentials" });

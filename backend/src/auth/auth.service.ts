@@ -21,6 +21,8 @@ export async function login(email: string, password: string, config: Config) {
   return {
     userId: user.id,
     role: user.role,
+    email: user.email,
+    name: user.name,
     accessToken: signAccessToken(user.id, user.role, config.jwtAccessSecret),
     refreshToken: signRefreshToken(user.id, config.jwtRefreshSecret)
   };

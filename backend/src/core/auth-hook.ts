@@ -17,7 +17,7 @@ export function requireAuth(config: Config) {
       if (!user || !user.ativo) {
         return reply.code(401).send({ error: "Unauthorized" });
       }
-      request.user = { id: user.id, role: user.role };
+      request.user = { id: user.id, role: user.role, email: user.email, name: user.name };
     } catch {
       return reply.code(401).send({ error: "Unauthorized" });
     }
