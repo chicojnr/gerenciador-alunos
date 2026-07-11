@@ -1,5 +1,18 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { GraduationCap, Building2, Clock, BookOpen, UserRound, Layers, Users, LogOut } from "lucide-react";
+import {
+  GraduationCap,
+  Building2,
+  Clock,
+  BookOpen,
+  UserRound,
+  Layers,
+  Users,
+  GraduationCap as StudentIcon,
+  Contact,
+  CalendarDays,
+  MessageCircle,
+  LogOut
+} from "lucide-react";
 import { useAuth } from "../auth/AuthContext.js";
 
 const NAV_ITEMS = [
@@ -8,6 +21,15 @@ const NAV_ITEMS = [
   { to: "/materias", label: "Matérias", icon: BookOpen, adminOnly: false },
   { to: "/professores", label: "Professores", icon: UserRound, adminOnly: false },
   { to: "/turmas", label: "Turmas", icon: Layers, adminOnly: false },
+  { to: "/alunos", label: "Alunos", icon: StudentIcon, adminOnly: false },
+  { to: "/responsaveis", label: "Pais/Responsáveis", icon: Contact, adminOnly: false },
+  { to: "/calendarios-letivos", label: "Calendário Letivo", icon: CalendarDays, adminOnly: false },
+  {
+    to: "/responsaveis-comunicacao",
+    label: "Resp. Comunicação",
+    icon: MessageCircle,
+    adminOnly: false
+  },
   { to: "/usuarios", label: "Usuários", icon: Users, adminOnly: true }
 ];
 
