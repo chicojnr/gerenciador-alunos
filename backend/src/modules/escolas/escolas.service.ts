@@ -11,6 +11,10 @@ function assertValidNome(nome: string | undefined) {
 }
 
 export const escolaService = {
+  listOptions() {
+    return escolaRepository.listOptions();
+  },
+
   list(page: number, pageSize: number) {
     return escolaRepository.list(page, pageSize);
   },

@@ -62,6 +62,30 @@ describe("escolas routes", () => {
     expect(response.statusCode).toBe(403);
   });
 
+  it("allows a non-admin to read /escolas/options (id+nome only, for Turma/Professor selects)", async () => {
+    await app.inject({
+      method: "POST",
+      url: "/escolas",
+      headers: { cookie: authCookie },
+      payload: { nome: "Escola Options Teste" }
+    });
+
+    const response = await app.inject({
+      method: "GET",
+      url: "/escolas/options",
+      headers: { cookie: nonAdminCookie }
+    });
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body).toEqual([expect.objectContaining({ nome: "Escola Options Teste" })]);
+    expect(body[0].cnpj).toBeUndefined();
+  });
+
+  it("rejects unauthenticated requests to /escolas/options", async () => {
+    const response = await app.inject({ method: "GET", url: "/escolas/options" });
+    expect(response.statusCode).toBe(401);
+  });
+
   it("creates then lists an escola", async () => {
     const createRes = await app.inject({
       method: "POST",

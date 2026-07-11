@@ -7,6 +7,13 @@ import type { CreateEscolaInput, UpdateEscolaInput } from "./escolas.types.js";
 export function registerEscolasRoutes(app: FastifyInstance, config: Config) {
   const auth = { preHandler: [requireAuth(config), requireRole("ADMIN")] };
 
+  // Lightweight, any-authenticated-user lookup (id+nome only) so Turma/Professor
+  // forms can populate an Escola select without needing the ADMIN-only full
+  // Escolas cadastro access.
+  app.get("/escolas/options", { preHandler: requireAuth(config) }, async () => {
+    return escolaService.listOptions();
+  });
+
   app.get<{ Querystring: { page?: string; pageSize?: string } }>(
     "/escolas",
     auth,

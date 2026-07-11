@@ -2,6 +2,14 @@ import { prisma } from "../../core/prisma.js";
 import type { CreateEscolaInput, UpdateEscolaInput } from "./escolas.types.js";
 
 export const escolaRepository = {
+  listOptions() {
+    return prisma.escola.findMany({
+      where: { ativo: true },
+      select: { id: true, nome: true },
+      orderBy: { nome: "asc" }
+    });
+  },
+
   async list(page: number, pageSize: number) {
     const [items, total] = await Promise.all([
       prisma.escola.findMany({
