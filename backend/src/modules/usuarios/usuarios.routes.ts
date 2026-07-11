@@ -27,7 +27,7 @@ export function registerUsuariosRoutes(app: FastifyInstance, config: Config) {
       return await usuarioService.getById(request.params.id);
     } catch (err) {
       if (err instanceof UsuarioNotFoundError) {
-        return reply.code(404).send({ error: "Usuario not found" });
+        return reply.code(404).send({ error: "Usuário não encontrado" });
       }
       throw err;
     }
@@ -53,7 +53,7 @@ export function registerUsuariosRoutes(app: FastifyInstance, config: Config) {
         return await usuarioService.update(request.params.id, request.body);
       } catch (err) {
         if (err instanceof UsuarioNotFoundError) {
-          return reply.code(404).send({ error: "Usuario not found" });
+          return reply.code(404).send({ error: "Usuário não encontrado" });
         }
         if (err instanceof UsuarioValidationError) {
           return reply.code(400).send({ error: err.message });
@@ -68,10 +68,10 @@ export function registerUsuariosRoutes(app: FastifyInstance, config: Config) {
       return await usuarioService.remove(request.params.id, request.user!.id);
     } catch (err) {
       if (err instanceof UsuarioNotFoundError) {
-        return reply.code(404).send({ error: "Usuario not found" });
+        return reply.code(404).send({ error: "Usuário não encontrado" });
       }
       if (err instanceof CannotDeactivateSelfError) {
-        return reply.code(400).send({ error: "Cannot deactivate your own account" });
+        return reply.code(400).send({ error: "Não é possível desativar sua própria conta" });
       }
       throw err;
     }

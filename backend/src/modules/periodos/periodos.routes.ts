@@ -22,7 +22,7 @@ export function registerPeriodosRoutes(app: FastifyInstance, config: Config) {
       return await periodoService.getById(request.params.id);
     } catch (err) {
       if (err instanceof PeriodoNotFoundError) {
-        return reply.code(404).send({ error: "Periodo not found" });
+        return reply.code(404).send({ error: "Período não encontrado" });
       }
       throw err;
     }
@@ -48,7 +48,7 @@ export function registerPeriodosRoutes(app: FastifyInstance, config: Config) {
         return await periodoService.update(request.params.id, request.body);
       } catch (err) {
         if (err instanceof PeriodoNotFoundError) {
-          return reply.code(404).send({ error: "Periodo not found" });
+          return reply.code(404).send({ error: "Período não encontrado" });
         }
         if (err instanceof PeriodoValidationError) {
           return reply.code(400).send({ error: err.message });
@@ -63,7 +63,7 @@ export function registerPeriodosRoutes(app: FastifyInstance, config: Config) {
       return await periodoService.remove(request.params.id);
     } catch (err) {
       if (err instanceof PeriodoNotFoundError) {
-        return reply.code(404).send({ error: "Periodo not found" });
+        return reply.code(404).send({ error: "Período não encontrado" });
       }
       throw err;
     }

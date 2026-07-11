@@ -22,7 +22,7 @@ export function registerMateriasRoutes(app: FastifyInstance, config: Config) {
       return await materiaService.getById(request.params.id);
     } catch (err) {
       if (err instanceof MateriaNotFoundError) {
-        return reply.code(404).send({ error: "Materia not found" });
+        return reply.code(404).send({ error: "Matéria não encontrada" });
       }
       throw err;
     }
@@ -48,7 +48,7 @@ export function registerMateriasRoutes(app: FastifyInstance, config: Config) {
         return await materiaService.update(request.params.id, request.body);
       } catch (err) {
         if (err instanceof MateriaNotFoundError) {
-          return reply.code(404).send({ error: "Materia not found" });
+          return reply.code(404).send({ error: "Matéria não encontrada" });
         }
         if (err instanceof MateriaValidationError) {
           return reply.code(400).send({ error: err.message });
@@ -63,7 +63,7 @@ export function registerMateriasRoutes(app: FastifyInstance, config: Config) {
       return await materiaService.remove(request.params.id);
     } catch (err) {
       if (err instanceof MateriaNotFoundError) {
-        return reply.code(404).send({ error: "Materia not found" });
+        return reply.code(404).send({ error: "Matéria não encontrada" });
       }
       throw err;
     }

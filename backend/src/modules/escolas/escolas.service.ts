@@ -6,7 +6,7 @@ export class EscolaValidationError extends Error {}
 
 function assertValidNome(nome: string | undefined) {
   if (nome !== undefined && nome.trim().length === 0) {
-    throw new EscolaValidationError("nome must not be empty");
+    throw new EscolaValidationError("nome não pode ser vazio");
   }
 }
 

@@ -6,7 +6,7 @@ export class PeriodoValidationError extends Error {}
 
 function assertValidNome(nome: string | undefined) {
   if (nome !== undefined && nome.trim().length === 0) {
-    throw new PeriodoValidationError("nome must not be empty");
+    throw new PeriodoValidationError("nome não pode ser vazio");
   }
 }
 

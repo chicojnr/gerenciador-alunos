@@ -6,7 +6,7 @@ export class MateriaValidationError extends Error {}
 
 function assertValidNome(nome: string | undefined) {
   if (nome !== undefined && nome.trim().length === 0) {
-    throw new MateriaValidationError("nome must not be empty");
+    throw new MateriaValidationError("nome não pode ser vazio");
   }
 }
 

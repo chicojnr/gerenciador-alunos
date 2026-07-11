@@ -22,7 +22,7 @@ export function registerEscolasRoutes(app: FastifyInstance, config: Config) {
       return await escolaService.getById(request.params.id);
     } catch (err) {
       if (err instanceof EscolaNotFoundError) {
-        return reply.code(404).send({ error: "Escola not found" });
+        return reply.code(404).send({ error: "Escola não encontrada" });
       }
       throw err;
     }
@@ -48,7 +48,7 @@ export function registerEscolasRoutes(app: FastifyInstance, config: Config) {
         return await escolaService.update(request.params.id, request.body);
       } catch (err) {
         if (err instanceof EscolaNotFoundError) {
-          return reply.code(404).send({ error: "Escola not found" });
+          return reply.code(404).send({ error: "Escola não encontrada" });
         }
         if (err instanceof EscolaValidationError) {
           return reply.code(400).send({ error: err.message });
@@ -63,7 +63,7 @@ export function registerEscolasRoutes(app: FastifyInstance, config: Config) {
       return await escolaService.remove(request.params.id);
     } catch (err) {
       if (err instanceof EscolaNotFoundError) {
-        return reply.code(404).send({ error: "Escola not found" });
+        return reply.code(404).send({ error: "Escola não encontrada" });
       }
       throw err;
     }

@@ -27,7 +27,7 @@ export function registerAuthRoutes(app: FastifyInstance, config: Config) {
       return { userId: result.userId, role: result.role, email: result.email, name: result.name };
     } catch (err) {
       if (err instanceof InvalidCredentialsError) {
-        return reply.code(401).send({ error: "Invalid credentials" });
+        return reply.code(401).send({ error: "Credenciais inválidas" });
       }
       throw err;
     }
@@ -36,19 +36,19 @@ export function registerAuthRoutes(app: FastifyInstance, config: Config) {
   app.post("/auth/refresh", async (request, reply) => {
     const refreshToken = request.cookies.refresh_token;
     if (!refreshToken) {
-      return reply.code(401).send({ error: "Unauthorized" });
+      return reply.code(401).send({ error: "Não autenticado" });
     }
     try {
       const payload = verifyToken(refreshToken, config.jwtRefreshSecret);
       const user = await prisma.user.findUnique({ where: { id: payload.userId } });
       if (!user || !user.ativo) {
-        return reply.code(401).send({ error: "Unauthorized" });
+        return reply.code(401).send({ error: "Não autenticado" });
       }
       const accessToken = signAccessToken(user.id, user.role, config.jwtAccessSecret);
       reply.setCookie("access_token", accessToken, COOKIE_OPTS);
       return { ok: true };
     } catch {
-      return reply.code(401).send({ error: "Unauthorized" });
+      return reply.code(401).send({ error: "Não autenticado" });
     }
   });
 

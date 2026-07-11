@@ -8,7 +8,7 @@ export class CannotDeactivateSelfError extends Error {}
 
 function assertValidName(name: string | undefined) {
   if (name !== undefined && name.trim().length === 0) {
-    throw new UsuarioValidationError("name must not be empty");
+    throw new UsuarioValidationError("nome não pode ser vazio");
   }
 }
 
@@ -28,15 +28,15 @@ export const usuarioService = {
   async create(data: CreateUsuarioInput) {
     assertValidName(data.name);
     if (!data.email || data.email.trim().length === 0) {
-      throw new UsuarioValidationError("email must not be empty");
+      throw new UsuarioValidationError("email não pode ser vazio");
     }
     if (!data.password || data.password.length < 8) {
-      throw new UsuarioValidationError("password must be at least 8 characters");
+      throw new UsuarioValidationError("senha deve ter pelo menos 8 caracteres");
     }
 
     const existing = await usuarioRepository.findByEmail(data.email);
     if (existing) {
-      throw new UsuarioValidationError("email already in use");
+      throw new UsuarioValidationError("email já está em uso");
     }
 
     const passwordHash = await hashPassword(data.password);
