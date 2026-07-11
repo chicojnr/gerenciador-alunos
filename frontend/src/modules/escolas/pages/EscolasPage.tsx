@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Building2, Plus } from "lucide-react";
 import { useEscolas } from "../hooks/useEscolas.js";
 import { EscolaForm } from "../components/EscolaForm.js";
 import { EscolaList } from "../components/EscolaList.js";
@@ -37,8 +38,14 @@ export function EscolasPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Escolas</h1>
-        <Button onClick={openCreate}>Nova Escola</Button>
+        <div className="flex items-center gap-2.5">
+          <Building2 className="h-5 w-5 text-zinc-400" strokeWidth={2} />
+          <h1 className="text-xl font-semibold text-zinc-900">Escolas</h1>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+          Nova Escola
+        </Button>
       </div>
       <EscolaList escolas={escolas} onEdit={openEdit} onRemove={remove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>

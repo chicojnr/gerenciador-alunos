@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Clock, Plus } from "lucide-react";
 import { usePeriodos } from "../hooks/usePeriodos.js";
 import { PeriodoForm } from "../components/PeriodoForm.js";
 import { PeriodoList } from "../components/PeriodoList.js";
@@ -37,8 +38,14 @@ export function PeriodosPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Períodos</h1>
-        <Button onClick={openCreate}>Novo Período</Button>
+        <div className="flex items-center gap-2.5">
+          <Clock className="h-5 w-5 text-zinc-400" strokeWidth={2} />
+          <h1 className="text-xl font-semibold text-zinc-900">Períodos</h1>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+          Novo Período
+        </Button>
       </div>
       <PeriodoList periodos={periodos} onEdit={openEdit} onRemove={remove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>

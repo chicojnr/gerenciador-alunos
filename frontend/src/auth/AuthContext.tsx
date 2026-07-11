@@ -5,6 +5,8 @@ import type { Role } from "./auth.service.js";
 interface AuthUser {
   id: string;
   role: Role;
+  email: string;
+  name: string;
 }
 
 interface AuthContextValue {
@@ -15,6 +17,10 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+function toAuthUser(result: { userId: string; role: Role; email: string; name: string }): AuthUser {
+  return { id: result.userId, role: result.role, email: result.email, name: result.name };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -27,7 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .me()
       .then((result) => {
         if (!cancelled) {
-          setUser({ id: result.userId, role: result.role });
+          setUser(toAuthUser(result));
         }
       })
       .catch(() => {
@@ -46,7 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, password: string) {
     const result = await authService.login(email, password);
-    setUser({ id: result.userId, role: result.role });
+    setUser(toAuthUser(result));
   }
 
   async function logout() {

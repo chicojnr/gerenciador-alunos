@@ -16,7 +16,13 @@ describe("AuthContext", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => new Response(JSON.stringify({ userId: "u1", role: "USER" }), { status: 200 }))
+      vi.fn(
+        async () =>
+          new Response(
+            JSON.stringify({ userId: "u1", role: "USER", email: "u1@example.com", name: "User One" }),
+            { status: 200 }
+          )
+      )
     );
   });
 
@@ -39,7 +45,10 @@ describe("AuthContext", () => {
       vi.fn(async (input: RequestInfo | URL) => {
         const url = typeof input === "string" ? input : input.toString();
         if (url.includes("/auth/me")) {
-          return new Response(JSON.stringify({ userId: "u2", role: "USER" }), { status: 200 });
+          return new Response(
+            JSON.stringify({ userId: "u2", role: "USER", email: "u2@example.com", name: "User Two" }),
+            { status: 200 }
+          );
         }
         throw new Error(`Unexpected fetch call: ${url}`);
       })

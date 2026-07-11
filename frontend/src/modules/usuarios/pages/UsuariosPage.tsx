@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Users, Plus } from "lucide-react";
 import { useUsuarios } from "../hooks/useUsuarios.js";
 import { UsuarioForm } from "../components/UsuarioForm.js";
 import { UsuarioList } from "../components/UsuarioList.js";
@@ -37,8 +38,14 @@ export function UsuariosPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Usuários</h1>
-        <Button onClick={openCreate}>Novo Usuário</Button>
+        <div className="flex items-center gap-2.5">
+          <Users className="h-5 w-5 text-zinc-400" strokeWidth={2} />
+          <h1 className="text-xl font-semibold text-zinc-900">Usuários</h1>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+          Novo Usuário
+        </Button>
       </div>
       <UsuarioList usuarios={usuarios} onEdit={openEdit} onRemove={remove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>

@@ -5,6 +5,8 @@ export type Role = "ADMIN" | "USER";
 export interface LoginResponse {
   userId: string;
   role: Role;
+  email: string;
+  name: string;
 }
 
 export const authService = {

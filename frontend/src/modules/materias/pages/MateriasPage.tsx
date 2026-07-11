@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { BookOpen, Plus } from "lucide-react";
 import { useMaterias } from "../hooks/useMaterias.js";
 import { MateriaForm } from "../components/MateriaForm.js";
 import { MateriaList } from "../components/MateriaList.js";
@@ -37,8 +38,14 @@ export function MateriasPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-zinc-900">Matérias</h1>
-        <Button onClick={openCreate}>Nova Matéria</Button>
+        <div className="flex items-center gap-2.5">
+          <BookOpen className="h-5 w-5 text-zinc-400" strokeWidth={2} />
+          <h1 className="text-xl font-semibold text-zinc-900">Matérias</h1>
+        </div>
+        <Button onClick={openCreate}>
+          <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+          Nova Matéria
+        </Button>
       </div>
       <MateriaList materias={materias} onEdit={openEdit} onRemove={remove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
