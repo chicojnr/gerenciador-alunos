@@ -17,4 +17,10 @@ describe("Table", () => {
     expect(screen.getByText("Nome")).toBeTruthy();
     expect(screen.getByText("Escola A")).toBeTruthy();
   });
+
+  it("shows an empty state when there are no rows", () => {
+    render(<Table<Row> columns={[{ key: "nome", header: "Nome" }]} rows={[]} rowKey={(r) => r.id} />);
+
+    expect(screen.getByText("Nenhum registro encontrado.")).toBeTruthy();
+  });
 });
