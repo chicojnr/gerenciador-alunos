@@ -10,6 +10,11 @@ import { registerUsuariosRoutes } from "./modules/usuarios/usuarios.routes.js";
 import { registerProfessoresRoutes } from "./modules/professores/professores.routes.js";
 import { registerTurmasRoutes } from "./modules/turmas/turmas.routes.js";
 import { registerTurmaMateriasRoutes } from "./modules/turma-materias/turma-materias.routes.js";
+import { registerAlunosRoutes } from "./modules/alunos/alunos.routes.js";
+import { registerResponsaveisRoutes } from "./modules/responsaveis/responsaveis.routes.js";
+import { registerAlunoResponsaveisRoutes } from "./modules/aluno-responsaveis/aluno-responsaveis.routes.js";
+import { registerCalendariosLetivosRoutes } from "./modules/calendarios-letivos/calendarios-letivos.routes.js";
+import { registerResponsaveisComunicacaoRoutes } from "./modules/responsaveis-comunicacao/responsaveis-comunicacao.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
@@ -28,6 +33,11 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerProfessoresRoutes(app, config);
   registerTurmasRoutes(app, config);
   registerTurmaMateriasRoutes(app, config);
+  registerAlunosRoutes(app, config);
+  registerResponsaveisRoutes(app, config);
+  registerAlunoResponsaveisRoutes(app, config);
+  registerCalendariosLetivosRoutes(app, config);
+  registerResponsaveisComunicacaoRoutes(app, config);
 
   return app;
 }

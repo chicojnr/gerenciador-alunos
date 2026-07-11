@@ -23,16 +23,18 @@ model User {
 }
 
 model Escola {
-  id         String      @id @default(uuid())
-  nome       String
-  cnpj       String?     @unique
-  endereco   String?
-  telefone   String?
-  ativo      Boolean     @default(true)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  professores Professor[]
-  turmas     Turma[]
+  id                       String                   @id @default(uuid())
+  nome                     String
+  cnpj                     String?                  @unique
+  endereco                 String?
+  telefone                 String?
+  ativo                    Boolean                  @default(true)
+  createdAt                DateTime                 @default(now())
+  updatedAt                DateTime                 @updatedAt
+  professores              Professor[]
+  turmas                   Turma[]
+  calendariosLetivos       CalendarioLetivo[]
+  responsaveisComunicacao  ResponsavelComunicacao[]
 }
 
 model Periodo {
@@ -78,6 +80,7 @@ model Turma {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   turmaMaterias TurmaMateria[]
+  alunos        Aluno[]
 }
 
 model TurmaMateria {
@@ -91,4 +94,62 @@ model TurmaMateria {
   createdAt   DateTime  @default(now())
 
   @@unique([turmaId, materiaId])
+}
+
+model Aluno {
+  id             String             @id @default(uuid())
+  nome           String
+  dataNascimento DateTime?
+  turmaId        String
+  turma          Turma              @relation(fields: [turmaId], references: [id])
+  ativo          Boolean            @default(true)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  responsaveis   AlunoResponsavel[]
+}
+
+model Responsavel {
+  id        String             @id @default(uuid())
+  nome      String
+  telefone  String?
+  email     String?
+  ativo     Boolean            @default(true)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  alunos    AlunoResponsavel[]
+}
+
+model AlunoResponsavel {
+  id            String      @id @default(uuid())
+  alunoId       String
+  aluno         Aluno       @relation(fields: [alunoId], references: [id])
+  responsavelId String
+  responsavel   Responsavel @relation(fields: [responsavelId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@unique([alunoId, responsavelId])
+}
+
+model CalendarioLetivo {
+  id         String   @id @default(uuid())
+  nome       String
+  dataInicio DateTime
+  dataFim    DateTime
+  escolaId   String
+  escola     Escola   @relation(fields: [escolaId], references: [id])
+  ativo      Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ResponsavelComunicacao {
+  id        String   @id @default(uuid())
+  nome      String
+  telefone  String?
+  email     String?
+  escolaId  String
+  escola    Escola   @relation(fields: [escolaId], references: [id])
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
