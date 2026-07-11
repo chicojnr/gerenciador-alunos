@@ -1,11 +1,13 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
-import { GraduationCap, Building2, Clock, BookOpen, Users, LogOut } from "lucide-react";
+import { GraduationCap, Building2, Clock, BookOpen, UserRound, Layers, Users, LogOut } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.js";
 
 const NAV_ITEMS = [
   { to: "/escolas", label: "Escolas", icon: Building2, adminOnly: true },
   { to: "/periodos", label: "Períodos", icon: Clock, adminOnly: false },
   { to: "/materias", label: "Matérias", icon: BookOpen, adminOnly: false },
+  { to: "/professores", label: "Professores", icon: UserRound, adminOnly: false },
+  { to: "/turmas", label: "Turmas", icon: Layers, adminOnly: false },
   { to: "/usuarios", label: "Usuários", icon: Users, adminOnly: true }
 ];
 
