@@ -22,9 +22,15 @@ export const notaService = {
     if (!Number.isInteger(bimestre) || bimestre < 1 || bimestre > 4) {
       throw new NotaValidationError("bimestre deve ser um número entre 1 e 4");
     }
-    for (const { valor } of notas) {
-      if (typeof valor !== "number" || Number.isNaN(valor) || valor < 0 || valor > 10) {
-        throw new NotaValidationError("nota deve ser um número entre 0 e 10");
+    if (!Array.isArray(notas)) {
+      throw new NotaValidationError("notas deve ser uma lista");
+    }
+    for (const { alunoId, valor } of notas) {
+      if (!alunoId) {
+        throw new NotaValidationError("alunoId é obrigatório em cada lançamento");
+      }
+      if (valor !== null && (typeof valor !== "number" || Number.isNaN(valor) || valor < 0 || valor > 10)) {
+        throw new NotaValidationError("nota deve ser um número entre 0 e 10, ou nula para apagar");
       }
     }
 

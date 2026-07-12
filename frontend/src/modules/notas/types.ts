@@ -1,6 +1,6 @@
 export interface NotaLancamento {
   alunoId: string;
-  valor: number;
+  valor: number | null;
 }
 
 export interface LancarNotasInput {

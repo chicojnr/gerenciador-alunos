@@ -17,7 +17,8 @@ import {
   AlertTriangle,
   LineChart,
   MessagesSquare,
-  SlidersHorizontal
+  SlidersHorizontal,
+  CalendarOff
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.js";
 
@@ -34,6 +35,7 @@ const NAV_ITEMS = [
   { to: "/alunos", label: "Alunos", icon: StudentIcon, adminOnly: false },
   { to: "/responsaveis", label: "Pais/Responsáveis", icon: Contact, adminOnly: false },
   { to: "/calendarios-letivos", label: "Calendário Letivo", icon: CalendarDays, adminOnly: false },
+  { to: "/dias-nao-letivos", label: "Dias Não Letivos", icon: CalendarOff, adminOnly: false },
   {
     to: "/responsaveis-comunicacao",
     label: "Resp. Comunicação",

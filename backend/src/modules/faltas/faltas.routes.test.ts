@@ -13,6 +13,7 @@ function isoDaysAgo(days: number): string {
 describe("faltas + indicadores routes", () => {
   let app: FastifyInstance;
   let authCookie: string;
+  let escolaId: string;
   let turmaId: string;
   let alunoId: string;
 
@@ -35,6 +36,7 @@ describe("faltas + indicadores routes", () => {
   beforeEach(async () => {
     await prisma.falta.deleteMany();
     await prisma.indicadorFalta.deleteMany();
+    await prisma.diaNaoLetivo.deleteMany();
     await prisma.aluno.deleteMany({ where: { nome: { contains: "faltas-test" } } });
     await prisma.turma.deleteMany({ where: { nome: { contains: "faltas-test" } } });
     await prisma.escola.deleteMany({ where: { nome: { contains: "faltas-test" } } });
@@ -48,6 +50,7 @@ describe("faltas + indicadores routes", () => {
     const aluno = await prisma.aluno.create({
       data: { nome: "Aluno faltas-test", turmaId: turma.id }
     });
+    escolaId = escola.id;
     turmaId = turma.id;
     alunoId = aluno.id;
   });
@@ -55,6 +58,7 @@ describe("faltas + indicadores routes", () => {
   afterAll(async () => {
     await prisma.falta.deleteMany();
     await prisma.indicadorFalta.deleteMany();
+    await prisma.diaNaoLetivo.deleteMany();
     await prisma.aluno.deleteMany({ where: { nome: { contains: "faltas-test" } } });
     await prisma.turma.deleteMany({ where: { nome: { contains: "faltas-test" } } });
     await prisma.escola.deleteMany({ where: { nome: { contains: "faltas-test" } } });
@@ -132,7 +136,7 @@ describe("faltas + indicadores routes", () => {
       method: "POST",
       url: "/indicadores",
       headers: { cookie: authCookie },
-      payload: { nome: "3 dias consecutivos", tipo: "CONSECUTIVAS", quantidade: 3 }
+      payload: { nome: "3 dias consecutivos", tipo: "CONSECUTIVAS", quantidade: 3, escolaId }
     });
 
     const avaliacao = await app.inject({
@@ -158,7 +162,7 @@ describe("faltas + indicadores routes", () => {
       method: "POST",
       url: "/indicadores",
       headers: { cookie: authCookie },
-      payload: { nome: "5 dias consecutivos", tipo: "CONSECUTIVAS", quantidade: 5 }
+      payload: { nome: "5 dias consecutivos", tipo: "CONSECUTIVAS", quantidade: 5, escolaId }
     });
 
     const avaliacao = await app.inject({
@@ -174,7 +178,7 @@ describe("faltas + indicadores routes", () => {
       method: "POST",
       url: "/indicadores",
       headers: { cookie: authCookie },
-      payload: { nome: "3 não consecutivas", tipo: "NAO_CONSECUTIVAS", quantidade: 3 }
+      payload: { nome: "3 não consecutivas", tipo: "NAO_CONSECUTIVAS", quantidade: 3, escolaId }
     });
     expect(response.statusCode).toBe(400);
   });
@@ -192,7 +196,13 @@ describe("faltas + indicadores routes", () => {
       method: "POST",
       url: "/indicadores",
       headers: { cookie: authCookie },
-      payload: { nome: "3 em 30 dias", tipo: "NAO_CONSECUTIVAS", quantidade: 3, janelaDias: 30 }
+      payload: {
+        nome: "3 em 30 dias",
+        tipo: "NAO_CONSECUTIVAS",
+        quantidade: 3,
+        janelaDias: 30,
+        escolaId
+      }
     });
 
     const avaliacao = await app.inject({
@@ -202,5 +212,49 @@ describe("faltas + indicadores routes", () => {
     });
     const body = avaliacao.json();
     expect(body[0].alunos.map((a: { id: string }) => a.id)).toContain(alunoId);
+  });
+
+  it("bridges a consecutive-days streak across cadastros dias não letivos (feriado/ponte)", async () => {
+    // Faltas em 5 e 2 dias atrás; os dois dias entre elas são cadastrados
+    // como não letivos (feriado + ponte) — a sequência deve valer 2, não 0.
+    await app.inject({
+      method: "POST",
+      url: "/faltas/registro",
+      headers: { cookie: authCookie },
+      payload: { turmaId, data: isoDaysAgo(5), alunoIds: [alunoId] }
+    });
+    await app.inject({
+      method: "POST",
+      url: "/faltas/registro",
+      headers: { cookie: authCookie },
+      payload: { turmaId, data: isoDaysAgo(2), alunoIds: [alunoId] }
+    });
+    await app.inject({
+      method: "POST",
+      url: `/escolas/${escolaId}/dias-nao-letivos`,
+      headers: { cookie: authCookie },
+      payload: { data: isoDaysAgo(4), tipo: "FERIADO", descricao: "Feriado faltas-test" }
+    });
+    await app.inject({
+      method: "POST",
+      url: `/escolas/${escolaId}/dias-nao-letivos`,
+      headers: { cookie: authCookie },
+      payload: { data: isoDaysAgo(3), tipo: "PONTE", descricao: "Ponte faltas-test" }
+    });
+    await app.inject({
+      method: "POST",
+      url: "/indicadores",
+      headers: { cookie: authCookie },
+      payload: { nome: "2 dias consecutivos", tipo: "CONSECUTIVAS", quantidade: 2, escolaId }
+    });
+
+    const avaliacao = await app.inject({
+      method: "GET",
+      url: "/indicadores/avaliacao",
+      headers: { cookie: authCookie }
+    });
+    const body = avaliacao.json();
+    expect(body[0].alunos.map((a: { id: string }) => a.id)).toContain(alunoId);
+    expect(body[0].alunos[0].faltas).toBe(2);
   });
 });

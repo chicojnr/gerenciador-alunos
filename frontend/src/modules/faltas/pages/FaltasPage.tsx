@@ -10,7 +10,10 @@ const SELECT_CLASSES =
   "rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
 function hoje(): string {
-  return new Date().toISOString().slice(0, 10);
+  const agora = new Date();
+  const mes = String(agora.getMonth() + 1).padStart(2, "0");
+  const dia = String(agora.getDate()).padStart(2, "0");
+  return `${agora.getFullYear()}-${mes}-${dia}`;
 }
 
 export function FaltasPage() {
@@ -22,22 +25,37 @@ export function FaltasPage() {
   const [loadingAlunos, setLoadingAlunos] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!turmaId) {
       setAlunos([]);
       return;
     }
+    let cancelado = false;
     setLoadingAlunos(true);
     setSaved(false);
-    Promise.all([
-      alunosService.list(turmaId),
-      faltasService.diaByTurma(turmaId, data)
-    ]).then(([alunosRes, diaRes]) => {
-      setAlunos(alunosRes.items);
-      setAusentes(new Set(diaRes.alunoIds));
-      setLoadingAlunos(false);
-    });
+    setLoadError(null);
+    Promise.all([alunosService.list(turmaId), faltasService.diaByTurma(turmaId, data)])
+      .then(([alunosRes, diaRes]) => {
+        if (cancelado) {
+          return;
+        }
+        setAlunos(alunosRes.items);
+        setAusentes(new Set(diaRes.alunoIds));
+        setLoadingAlunos(false);
+      })
+      .catch((err) => {
+        if (cancelado) {
+          return;
+        }
+        setLoadError(err instanceof Error ? err.message : "Não foi possível carregar os alunos.");
+        setLoadingAlunos(false);
+      });
+    return () => {
+      cancelado = true;
+    };
   }, [turmaId, data]);
 
   function toggle(alunoId: string) {
@@ -55,9 +73,15 @@ export function FaltasPage() {
 
   async function handleSave() {
     setSaving(true);
-    await faltasService.registrar({ turmaId, data, alunoIds: [...ausentes] });
-    setSaving(false);
-    setSaved(true);
+    setSaveError(null);
+    try {
+      await faltasService.registrar({ turmaId, data, alunoIds: [...ausentes] });
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Não foi possível salvar as faltas.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -93,6 +117,10 @@ export function FaltasPage() {
         <p className="text-sm text-zinc-400">Selecione uma turma para marcar as faltas do dia.</p>
       ) : loadingAlunos ? (
         <p className="text-sm text-zinc-400">Carregando...</p>
+      ) : loadError ? (
+        <p role="alert" className="text-sm text-red-600">
+          {loadError}
+        </p>
       ) : alunos.length === 0 ? (
         <p className="text-sm text-zinc-400">Nenhum aluno nesta turma.</p>
       ) : (
@@ -121,6 +149,11 @@ export function FaltasPage() {
               {saving ? "Salvando..." : "Salvar"}
             </Button>
             {saved && <span className="text-sm text-emerald-600">Faltas registradas.</span>}
+            {saveError && (
+              <span role="alert" className="text-sm text-red-600">
+                {saveError}
+              </span>
+            )}
           </div>
         </div>
       )}

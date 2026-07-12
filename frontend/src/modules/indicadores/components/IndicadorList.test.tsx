@@ -12,6 +12,8 @@ describe("IndicadorList", () => {
         tipo: "CONSECUTIVAS",
         quantidade: 3,
         janelaDias: null,
+        escolaId: "escola-1",
+        escola: { id: "escola-1", nome: "Escola Central" },
         ativo: true
       }
     ];

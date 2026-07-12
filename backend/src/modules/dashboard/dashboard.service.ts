@@ -12,10 +12,10 @@ export const dashboardService = {
         prisma.turma.count({ where: { ativo: true } }),
         prisma.aluno.count({ where: { ativo: true } }),
         prisma.professor.count({ where: { ativo: true } }),
-        prisma.falta.count({ where: { data: { gte: desde } } }),
+        prisma.falta.count({ where: { data: { gte: desde }, aluno: { ativo: true } } }),
         prisma.falta.groupBy({
           by: ["alunoId"],
-          where: { data: { gte: desde } },
+          where: { data: { gte: desde }, aluno: { ativo: true } },
           _count: { _all: true }
         }),
         prisma.nota.groupBy({ by: ["materiaId"], _avg: { valor: true } })

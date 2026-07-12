@@ -20,6 +20,7 @@ export interface EnviarMensagensInput {
 export interface EnviarMensagensResultado {
   registrados: number;
   semResponsavel: { id: string; nome: string }[];
+  semTelefone: { id: string; nome: string; responsavel: string }[];
 }
 
 export interface Envio {

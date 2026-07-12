@@ -12,7 +12,10 @@ interface IndicadorListResponse {
 }
 
 export const indicadoresService = {
-  list: () => apiClient.get<IndicadorListResponse>("/indicadores"),
+  list: (escolaId?: string) =>
+    apiClient.get<IndicadorListResponse>(
+      escolaId ? `/indicadores?escolaId=${escolaId}&pageSize=200` : "/indicadores"
+    ),
   create: (data: CreateIndicadorInput) => apiClient.post<Indicador>("/indicadores", data),
   update: (id: string, data: UpdateIndicadorInput) =>
     apiClient.put<Indicador>(`/indicadores/${id}`, data),

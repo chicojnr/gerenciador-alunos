@@ -91,6 +91,28 @@ describe("notas routes", () => {
     expect(consulta.json().notas).toEqual([{ alunoId, valor: 8.0 }]);
   });
 
+  it("clears a nota when relaunched with valor null", async () => {
+    await app.inject({
+      method: "POST",
+      url: "/notas/lote",
+      headers: { cookie: authCookie },
+      payload: { materiaId, bimestre: 3, notas: [{ alunoId, valor: 7 }] }
+    });
+    await app.inject({
+      method: "POST",
+      url: "/notas/lote",
+      headers: { cookie: authCookie },
+      payload: { materiaId, bimestre: 3, notas: [{ alunoId, valor: null }] }
+    });
+
+    const consulta = await app.inject({
+      method: "GET",
+      url: `/notas?turmaId=${turmaId}&materiaId=${materiaId}&bimestre=3`,
+      headers: { cookie: authCookie }
+    });
+    expect(consulta.json().notas).toEqual([]);
+  });
+
   it("rejects a nota outside the 0-10 range", async () => {
     const response = await app.inject({
       method: "POST",

@@ -10,21 +10,15 @@ export const notaRepository = {
   },
 
   upsertMany(materiaId: string, bimestre: number, notas: NotaLancamento[]) {
-    return prisma.$transaction(
-      notas.map(({ alunoId, valor }) =>
-        prisma.nota.upsert({
-          where: { alunoId_materiaId_bimestre: { alunoId, materiaId, bimestre } },
-          update: { valor },
-          create: { alunoId, materiaId, bimestre, valor }
-        })
-      )
+    const operacoes = notas.map(({ alunoId, valor }) =>
+      valor === null
+        ? prisma.nota.deleteMany({ where: { alunoId, materiaId, bimestre } })
+        : prisma.nota.upsert({
+            where: { alunoId_materiaId_bimestre: { alunoId, materiaId, bimestre } },
+            update: { valor },
+            create: { alunoId, materiaId, bimestre, valor }
+          })
     );
-  },
-
-  mediaPorMateria() {
-    return prisma.nota.groupBy({
-      by: ["materiaId"],
-      _avg: { valor: true }
-    });
+    return prisma.$transaction(operacoes);
   }
 };

@@ -19,6 +19,7 @@ import { AlertasPage } from "./modules/indicadores/pages/AlertasPage.js";
 import { IndicadoresPage } from "./modules/indicadores/pages/IndicadoresPage.js";
 import { DesempenhoPage } from "./modules/notas/pages/DesempenhoPage.js";
 import { TemplatesPage } from "./modules/mensagens/pages/TemplatesPage.js";
+import { DiasNaoLetivosPage } from "./modules/dias-nao-letivos/pages/DiasNaoLetivosPage.js";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
       { path: "desempenho", element: <DesempenhoPage /> },
       { path: "templates", element: <TemplatesPage /> },
       { path: "indicadores", element: <IndicadoresPage /> },
+      { path: "dias-nao-letivos", element: <DiasNaoLetivosPage /> },
       { path: "periodos", element: <PeriodosPage /> },
       { path: "materias", element: <MateriasPage /> },
       { path: "professores", element: <ProfessoresPage /> },

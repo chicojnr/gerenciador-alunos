@@ -2,16 +2,23 @@ import { useCallback, useEffect, useState } from "react";
 import { indicadoresService } from "../services/indicadores.service.js";
 import type { Indicador, CreateIndicadorInput, UpdateIndicadorInput } from "../types.js";
 
-export function useIndicadores() {
+export function useIndicadores(escolaId?: string) {
   const [indicadores, setIndicadores] = useState<Indicador[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const { items } = await indicadoresService.list();
-    setIndicadores(items);
-    setLoading(false);
-  }, []);
+    setError(null);
+    try {
+      const { items } = await indicadoresService.list(escolaId);
+      setIndicadores(items);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível carregar os indicadores.");
+    } finally {
+      setLoading(false);
+    }
+  }, [escolaId]);
 
   useEffect(() => {
     refresh();
@@ -32,5 +39,5 @@ export function useIndicadores() {
     await refresh();
   }
 
-  return { indicadores, loading, create, update, remove };
+  return { indicadores, loading, error, create, update, remove };
 }

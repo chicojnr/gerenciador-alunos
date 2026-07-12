@@ -35,6 +35,8 @@ model Escola {
   turmas                   Turma[]
   calendariosLetivos       CalendarioLetivo[]
   responsaveisComunicacao  ResponsavelComunicacao[]
+  diasNaoLetivos           DiaNaoLetivo[]
+  indicadoresFalta         IndicadorFalta[]
 }
 
 model Periodo {
@@ -180,9 +182,32 @@ model IndicadorFalta {
   tipo       TipoIndicador
   quantidade Int
   janelaDias Int?
+  escolaId   String
+  escola     Escola        @relation(fields: [escolaId], references: [id])
   ativo      Boolean       @default(true)
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+}
+
+enum TipoDiaNaoLetivo {
+  FERIADO
+  PONTE
+  FERIAS
+}
+
+// Dias em que não há aula além dos fins de semana (padrão) — feriados,
+// pontes e períodos de férias. Usado para não quebrar sequências de faltas
+// consecutivas em dias em que o aluno simplesmente não tinha aula.
+model DiaNaoLetivo {
+  id        String           @id @default(uuid())
+  escolaId  String
+  escola    Escola           @relation(fields: [escolaId], references: [id])
+  data      DateTime         @db.Date
+  tipo      TipoDiaNaoLetivo
+  descricao String?
+  createdAt DateTime         @default(now())
+
+  @@unique([escolaId, data])
 }
 
 model Nota {

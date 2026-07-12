@@ -139,4 +139,45 @@ describe("mensagens routes", () => {
     });
     expect(response.statusCode).toBe(400);
   });
+
+  it("rejects an envio with a removed (soft-deleted) template", async () => {
+    await app.inject({
+      method: "DELETE",
+      url: `/mensagens/templates/${templateId}`,
+      headers: { cookie: authCookie }
+    });
+    const response = await app.inject({
+      method: "POST",
+      url: "/mensagens/envios",
+      headers: { cookie: authCookie },
+      payload: { templateId, alunoIds: [alunoComResponsavelId] }
+    });
+    expect(response.statusCode).toBe(404);
+  });
+
+  it("skips a soft-deleted aluno and reports alunos sem telefone separately", async () => {
+    await prisma.aluno.update({
+      where: { id: alunoSemResponsavelId },
+      data: { ativo: false }
+    });
+    const responsavelSemTelefone = await prisma.responsavel.create({
+      data: { nome: "Pai mensagens-test" }
+    });
+    await prisma.alunoResponsavel.create({
+      data: { alunoId: alunoComResponsavelId, responsavelId: responsavelSemTelefone.id }
+    });
+
+    const envioRes = await app.inject({
+      method: "POST",
+      url: "/mensagens/envios",
+      headers: { cookie: authCookie },
+      payload: { templateId, alunoIds: [alunoComResponsavelId, alunoSemResponsavelId] }
+    });
+    const body = envioRes.json();
+    expect(body.registrados).toBe(1);
+    expect(body.semResponsavel).toEqual([]);
+    expect(body.semTelefone).toEqual([
+      { id: alunoComResponsavelId, nome: "Aluno Com mensagens-test", responsavel: "Pai mensagens-test" }
+    ]);
+  });
 });

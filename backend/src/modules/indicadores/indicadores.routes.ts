@@ -11,13 +11,13 @@ import type { CreateIndicadorInput, UpdateIndicadorInput } from "./indicadores.t
 export function registerIndicadoresRoutes(app: FastifyInstance, config: Config) {
   const auth = { preHandler: requireAuth(config) };
 
-  app.get<{ Querystring: { page?: string; pageSize?: string } }>(
+  app.get<{ Querystring: { page?: string; pageSize?: string; escolaId?: string } }>(
     "/indicadores",
     auth,
     async (request) => {
       const page = Number(request.query.page ?? 1);
       const pageSize = Number(request.query.pageSize ?? 20);
-      return indicadorService.list(page, pageSize);
+      return indicadorService.list(page, pageSize, request.query.escolaId);
     }
   );
 

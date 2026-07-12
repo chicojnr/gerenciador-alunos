@@ -64,6 +64,13 @@ export function EnviarMensagemModal({ open, onClose, alunoIds }: EnviarMensagemM
               mensagem: {resultado.semResponsavel.map((a) => a.nome).join(", ")}
             </p>
           )}
+          {resultado.semTelefone.length > 0 && (
+            <p className="text-sm text-amber-600">
+              {resultado.semTelefone.length} responsável(is) sem telefone cadastrado, não recebeu
+              mensagem:{" "}
+              {resultado.semTelefone.map((r) => `${r.responsavel} (${r.nome})`).join(", ")}
+            </p>
+          )}
           <Button variant="secondary" onClick={handleClose} className="w-full">
             Fechar
           </Button>

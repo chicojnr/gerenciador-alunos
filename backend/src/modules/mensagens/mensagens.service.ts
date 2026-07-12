@@ -65,12 +65,12 @@ export const envioService = {
       throw new MensagemValidationError("selecione ao menos um aluno");
     }
     const template = await templateRepository.findById(templateId);
-    if (!template) {
+    if (!template || !template.ativo) {
       throw new TemplateNotFoundError(templateId);
     }
 
     const alunos = await prisma.aluno.findMany({
-      where: { id: { in: alunoIds } },
+      where: { id: { in: alunoIds }, ativo: true },
       include: {
         responsaveis: {
           include: {
@@ -82,13 +82,19 @@ export const envioService = {
 
     const envios = [];
     const semResponsavel: { id: string; nome: string }[] = [];
+    const semTelefone: { id: string; nome: string; responsavel: string }[] = [];
     for (const aluno of alunos) {
       const responsaveisAtivos = aluno.responsaveis.filter((r) => r.responsavel.ativo);
       if (responsaveisAtivos.length === 0) {
         semResponsavel.push({ id: aluno.id, nome: aluno.nome });
         continue;
       }
+      let algumEnviado = false;
       for (const { responsavel } of responsaveisAtivos) {
+        if (!responsavel.telefone) {
+          semTelefone.push({ id: aluno.id, nome: aluno.nome, responsavel: responsavel.nome });
+          continue;
+        }
         envios.push({
           templateId,
           alunoId: aluno.id,
@@ -96,6 +102,10 @@ export const envioService = {
           telefone: responsavel.telefone,
           mensagem: renderMensagem(template.conteudo, aluno.nome, responsavel.nome)
         });
+        algumEnviado = true;
+      }
+      if (!algumEnviado) {
+        semResponsavel.push({ id: aluno.id, nome: aluno.nome });
       }
     }
 
@@ -103,6 +113,6 @@ export const envioService = {
       await envioRepository.createMany(envios);
     }
 
-    return { registrados: envios.length, semResponsavel };
+    return { registrados: envios.length, semResponsavel, semTelefone };
   }
 };

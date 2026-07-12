@@ -1,5 +1,5 @@
 interface BarListProps {
-  items: { label: string; value: number }[];
+  items: { id: string; label: string; value: number }[];
   formatValue?: (value: number) => string;
   accentClassName?: string;
 }
@@ -13,7 +13,7 @@ export function BarList({ items, formatValue, accentClassName = "bg-indigo-500" 
   return (
     <ul className="space-y-2.5">
       {items.map((item) => (
-        <li key={item.label}>
+        <li key={item.id}>
           <div className="mb-1 flex items-center justify-between text-sm">
             <span className="text-zinc-700">{item.label}</span>
             <span className="tabular-nums font-medium text-zinc-900">

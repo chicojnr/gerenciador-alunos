@@ -5,6 +5,7 @@ export interface CreateIndicadorInput {
   tipo: TipoIndicador;
   quantidade: number;
   janelaDias?: number;
+  escolaId: string;
 }
 
 export type UpdateIndicadorInput = Partial<CreateIndicadorInput>;

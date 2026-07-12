@@ -9,7 +9,7 @@ interface AlunoListResponse {
 export const alunosService = {
   list: (turmaId?: string) =>
     apiClient.get<AlunoListResponse>(
-      turmaId ? `/alunos?turmaId=${turmaId}&pageSize=200` : "/alunos"
+      turmaId ? `/alunos?turmaId=${turmaId}&pageSize=1000` : "/alunos"
     ),
   create: (data: CreateAlunoInput) => apiClient.post<Aluno>("/alunos", data),
   update: (id: string, data: UpdateAlunoInput) => apiClient.put<Aluno>(`/alunos/${id}`, data),

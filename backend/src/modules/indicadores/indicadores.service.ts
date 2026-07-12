@@ -1,6 +1,7 @@
 import { indicadorRepository } from "./indicadores.repository.js";
 import { faltaRepository } from "../faltas/faltas.repository.js";
-import { sequenciaAteMaisRecente, faltasNaJanela } from "./indicadores.engine.js";
+import { diaNaoLetivoRepository } from "../dias-nao-letivos/dias-nao-letivos.repository.js";
+import { sequenciaAteMaisRecente, faltasNaJanela, toDiaNumero, ehFimDeSemana } from "./indicadores.engine.js";
 import type { CreateIndicadorInput, UpdateIndicadorInput } from "./indicadores.types.js";
 
 export class IndicadorNotFoundError extends Error {}
@@ -29,9 +30,37 @@ function assertValid(data: CreateIndicadorInput | UpdateIndicadorInput) {
   }
 }
 
+function assertRequiredOnCreate(data: CreateIndicadorInput) {
+  if (!data.nome || !data.nome.trim()) {
+    throw new IndicadorValidationError("nome é obrigatório");
+  }
+  if (!data.tipo) {
+    throw new IndicadorValidationError("tipo é obrigatório");
+  }
+  if (data.quantidade === undefined) {
+    throw new IndicadorValidationError("quantidade é obrigatória");
+  }
+  if (!data.escolaId) {
+    throw new IndicadorValidationError("escola é obrigatória");
+  }
+}
+
+// "Hoje" no fuso horário do Brasil — evita que a virada de dia em UTC (21h em
+// Brasília) mude a data de referência antes da hora local realmente virar.
+function hojeBrasil(): Date {
+  const partes = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+  const valor = (tipo: string) => Number(partes.find((p) => p.type === tipo)!.value);
+  return new Date(Date.UTC(valor("year"), valor("month") - 1, valor("day")));
+}
+
 export const indicadorService = {
-  list(page: number, pageSize: number) {
-    return indicadorRepository.list(page, pageSize);
+  list(page: number, pageSize: number, escolaId?: string) {
+    return indicadorRepository.list(page, pageSize, escolaId);
   },
 
   async getById(id: string) {
@@ -43,13 +72,14 @@ export const indicadorService = {
   },
 
   async create(data: CreateIndicadorInput) {
+    assertRequiredOnCreate(data);
     assertValid(data);
     return indicadorRepository.create(data);
   },
 
   async update(id: string, data: UpdateIndicadorInput) {
-    assertValid(data);
-    await this.getById(id);
+    const existente = await this.getById(id);
+    assertValid({ ...data, tipo: data.tipo ?? existente.tipo });
     return indicadorRepository.update(id, data);
   },
 
@@ -58,7 +88,7 @@ export const indicadorService = {
     return indicadorRepository.softDelete(id);
   },
 
-  async avaliar(referencia: Date = new Date()) {
+  async avaliar(referencia: Date = hojeBrasil()) {
     const indicadores = await indicadorRepository.listAtivos();
     if (indicadores.length === 0) {
       return [];
@@ -67,11 +97,19 @@ export const indicadorService = {
     const desde = new Date(referencia.getTime() - JANELA_MAXIMA_DIAS * 86_400_000);
     const faltas = await faltaRepository.listSince(desde);
 
-    const porAluno = new Map<
+    // Agrupa faltas por escola (via turma do aluno) e depois por aluno —
+    // cada escola tem seu próprio calendário de dias não letivos.
+    const porEscola = new Map<
       string,
-      { aluno: (typeof faltas)[number]["aluno"]; datas: Date[] }
+      Map<string, { aluno: (typeof faltas)[number]["aluno"]; datas: Date[] }>
     >();
     for (const falta of faltas) {
+      const escolaId = falta.aluno.turma.escolaId;
+      let porAluno = porEscola.get(escolaId);
+      if (!porAluno) {
+        porAluno = new Map();
+        porEscola.set(escolaId, porAluno);
+      }
       const atual = porAluno.get(falta.alunoId);
       if (atual) {
         atual.datas.push(falta.data);
@@ -80,12 +118,31 @@ export const indicadorService = {
       }
     }
 
+    const escolaIds = [...new Set(indicadores.map((i) => i.escolaId))];
+    const diasNaoLetivos = await diaNaoLetivoRepository.listByEscolas(escolaIds, desde);
+    const naoLetivosPorEscola = new Map<string, Set<number>>();
+    for (const dia of diasNaoLetivos) {
+      const existente = naoLetivosPorEscola.get(dia.escolaId);
+      const diaNumero = toDiaNumero(dia.data);
+      if (existente) {
+        existente.add(diaNumero);
+      } else {
+        naoLetivosPorEscola.set(dia.escolaId, new Set([diaNumero]));
+      }
+    }
+
     return indicadores.map((indicador) => {
+      const excecoes = naoLetivosPorEscola.get(indicador.escolaId);
+      const ehDiaNaoLetivo = excecoes
+        ? (dia: number) => ehFimDeSemana(dia) || excecoes.has(dia)
+        : ehFimDeSemana;
+
+      const porAluno = porEscola.get(indicador.escolaId) ?? new Map();
       const alunos = [];
       for (const { aluno, datas } of porAluno.values()) {
         const valor =
           indicador.tipo === "CONSECUTIVAS"
-            ? sequenciaAteMaisRecente(datas)
+            ? sequenciaAteMaisRecente(datas, referencia, ehDiaNaoLetivo)
             : faltasNaJanela(datas, indicador.janelaDias ?? 30, referencia);
         if (valor >= indicador.quantidade) {
           alunos.push({ ...aluno, faltas: valor });

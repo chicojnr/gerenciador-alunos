@@ -8,14 +8,33 @@ import type { AvaliacaoIndicador } from "../types.js";
 export function AlertasPage() {
   const [avaliacao, setAvaliacao] = useState<AvaliacaoIndicador[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selecionados, setSelecionados] = useState<Set<string>>(new Set());
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
-    indicadoresService.avaliacao().then((result) => {
-      setAvaliacao(result);
-      setLoading(false);
-    });
+    let cancelado = false;
+    indicadoresService
+      .avaliacao()
+      .then((result) => {
+        if (cancelado) {
+          return;
+        }
+        setAvaliacao(result);
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (cancelado) {
+          return;
+        }
+        setError(
+          err instanceof Error ? err.message : "Não foi possível carregar os alertas."
+        );
+        setLoading(false);
+      });
+    return () => {
+      cancelado = true;
+    };
   }, []);
 
   function toggle(alunoId: string) {
@@ -32,6 +51,14 @@ export function AlertasPage() {
 
   if (loading) {
     return <p className="text-zinc-500">Carregando...</p>;
+  }
+
+  if (error) {
+    return (
+      <p role="alert" className="text-sm text-red-600">
+        {error}
+      </p>
+    );
   }
 
   const semAlertas = avaliacao.every((a) => a.alunos.length === 0);
@@ -62,7 +89,8 @@ export function AlertasPage() {
                 <div className="border-b border-zinc-100 px-4 py-3">
                   <h2 className="text-sm font-semibold text-zinc-900">{indicador.nome}</h2>
                   <p className="text-xs text-zinc-400">
-                    {alunos.length} aluno{alunos.length === 1 ? "" : "s"} atingiu o limite
+                    {indicador.escola.nome} · {alunos.length} aluno
+                    {alunos.length === 1 ? "" : "s"} atingiu o limite
                   </p>
                 </div>
                 <ul className="divide-y divide-zinc-100">

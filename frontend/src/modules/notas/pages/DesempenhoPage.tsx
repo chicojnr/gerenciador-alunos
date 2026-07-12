@@ -23,26 +23,44 @@ export function DesempenhoPage() {
   const [loadingDados, setLoadingDados] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!turmaId || !materiaId) {
       setAlunos([]);
       return;
     }
+    let cancelado = false;
     setLoadingDados(true);
     setSaved(false);
+    setLoadError(null);
     Promise.all([
       alunosService.list(turmaId),
       notasService.listByTurmaMateriaBimestre(turmaId, materiaId, bimestre)
-    ]).then(([alunosRes, notasRes]) => {
-      setAlunos(alunosRes.items);
-      const mapa: Record<string, string> = {};
-      for (const n of notasRes.notas) {
-        mapa[n.alunoId] = String(n.valor);
-      }
-      setNotas(mapa);
-      setLoadingDados(false);
-    });
+    ])
+      .then(([alunosRes, notasRes]) => {
+        if (cancelado) {
+          return;
+        }
+        setAlunos(alunosRes.items);
+        const mapa: Record<string, string> = {};
+        for (const n of notasRes.notas) {
+          mapa[n.alunoId] = String(n.valor);
+        }
+        setNotas(mapa);
+        setLoadingDados(false);
+      })
+      .catch((err) => {
+        if (cancelado) {
+          return;
+        }
+        setLoadError(err instanceof Error ? err.message : "Não foi possível carregar as notas.");
+        setLoadingDados(false);
+      });
+    return () => {
+      cancelado = true;
+    };
   }, [turmaId, materiaId, bimestre]);
 
   function setNota(alunoId: string, valor: string) {
@@ -52,12 +70,19 @@ export function DesempenhoPage() {
 
   async function handleSave() {
     setSaving(true);
-    const lancamentos = Object.entries(notas)
-      .filter(([, valor]) => valor !== "")
-      .map(([alunoId, valor]) => ({ alunoId, valor: Number(valor) }));
-    await notasService.lancar({ materiaId, bimestre, notas: lancamentos });
-    setSaving(false);
-    setSaved(true);
+    setSaveError(null);
+    try {
+      const lancamentos = Object.entries(notas).map(([alunoId, valor]) => ({
+        alunoId,
+        valor: valor === "" ? null : Number(valor)
+      }));
+      await notasService.lancar({ materiaId, bimestre, notas: lancamentos });
+      setSaved(true);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Não foi possível salvar as notas.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -111,6 +136,10 @@ export function DesempenhoPage() {
         <p className="text-sm text-zinc-400">Selecione turma e matéria para lançar notas.</p>
       ) : loadingDados ? (
         <p className="text-sm text-zinc-400">Carregando...</p>
+      ) : loadError ? (
+        <p role="alert" className="text-sm text-red-600">
+          {loadError}
+        </p>
       ) : alunos.length === 0 ? (
         <p className="text-sm text-zinc-400">Nenhum aluno nesta turma.</p>
       ) : (
@@ -138,6 +167,11 @@ export function DesempenhoPage() {
               {saving ? "Salvando..." : "Salvar"}
             </Button>
             {saved && <span className="text-sm text-emerald-600">Notas salvas.</span>}
+            {saveError && (
+              <span role="alert" className="text-sm text-red-600">
+                {saveError}
+              </span>
+            )}
           </div>
         </div>
       )}

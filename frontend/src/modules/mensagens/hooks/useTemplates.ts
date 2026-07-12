@@ -5,12 +5,19 @@ import type { Template, CreateTemplateInput, UpdateTemplateInput } from "../type
 export function useTemplates() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const { items } = await mensagensService.listTemplates();
-    setTemplates(items);
-    setLoading(false);
+    setError(null);
+    try {
+      const { items } = await mensagensService.listTemplates();
+      setTemplates(items);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível carregar os templates.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -32,5 +39,5 @@ export function useTemplates() {
     await refresh();
   }
 
-  return { templates, loading, create, update, remove };
+  return { templates, loading, error, create, update, remove };
 }

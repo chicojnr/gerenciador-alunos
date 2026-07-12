@@ -21,6 +21,7 @@ export function IndicadorList({ indicadores, onEdit, onRemove }: IndicadorListPr
     <Table<Indicador>
       columns={[
         { key: "nome", header: "Nome" },
+        { key: "escola", header: "Escola", render: (indicador) => indicador.escola.nome },
         { key: "tipo", header: "Regra", render: descricao },
         {
           key: "acoes",

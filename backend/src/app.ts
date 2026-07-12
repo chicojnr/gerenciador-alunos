@@ -20,6 +20,7 @@ import { registerIndicadoresRoutes } from "./modules/indicadores/indicadores.rou
 import { registerNotasRoutes } from "./modules/notas/notas.routes.js";
 import { registerMensagensRoutes } from "./modules/mensagens/mensagens.routes.js";
 import { registerDashboardRoutes } from "./modules/dashboard/dashboard.routes.js";
+import { registerDiasNaoLetivosRoutes } from "./modules/dias-nao-letivos/dias-nao-letivos.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
@@ -48,6 +49,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerNotasRoutes(app, config);
   registerMensagensRoutes(app, config);
   registerDashboardRoutes(app, config);
+  registerDiasNaoLetivosRoutes(app, config);
 
   return app;
 }

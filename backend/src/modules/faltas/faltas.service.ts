@@ -1,18 +1,27 @@
 import { prisma } from "../../core/prisma.js";
-import { faltaRepository } from "./faltas.repository.js";
+import { faltaRepository, FaltaConcorrenciaError } from "./faltas.repository.js";
 import type { RegistrarFaltasInput } from "./faltas.types.js";
 
+export { FaltaConcorrenciaError };
 export class FaltaValidationError extends Error {}
 
 function parseData(iso: string): Date {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+  if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
     throw new FaltaValidationError("data deve estar no formato AAAA-MM-DD");
   }
-  return new Date(iso);
+  const [ano, mes, dia] = iso.split("-").map(Number);
+  const data = new Date(Date.UTC(ano, mes - 1, dia));
+  if (data.getUTCFullYear() !== ano || data.getUTCMonth() !== mes - 1 || data.getUTCDate() !== dia) {
+    throw new FaltaValidationError("data inválida");
+  }
+  return data;
 }
 
 export const faltaService = {
   async listByTurmaAndData(turmaId: string, dataISO: string) {
+    if (!turmaId) {
+      throw new FaltaValidationError("turma é obrigatória");
+    }
     const data = parseData(dataISO);
     const faltas = await faltaRepository.listByTurmaAndData(turmaId, data);
     return { alunoIds: faltas.map((f) => f.alunoId) };
@@ -21,6 +30,9 @@ export const faltaService = {
   async registrarDia({ turmaId, data: dataISO, alunoIds }: RegistrarFaltasInput) {
     if (!turmaId) {
       throw new FaltaValidationError("turma é obrigatória");
+    }
+    if (!Array.isArray(alunoIds)) {
+      throw new FaltaValidationError("alunoIds deve ser uma lista");
     }
     const data = parseData(dataISO);
 

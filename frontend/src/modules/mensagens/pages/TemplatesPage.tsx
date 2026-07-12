@@ -8,12 +8,20 @@ import { Button } from "../../../shared/components/Button.js";
 import type { Template, CreateTemplateInput } from "../types.js";
 
 export function TemplatesPage() {
-  const { templates, loading, create, update, remove } = useTemplates();
+  const { templates, loading, error, create, update, remove } = useTemplates();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Template | null>(null);
 
   if (loading) {
     return <p className="text-zinc-500">Carregando...</p>;
+  }
+
+  if (error) {
+    return (
+      <p role="alert" className="text-sm text-red-600">
+        {error}
+      </p>
+    );
   }
 
   function openCreate() {
