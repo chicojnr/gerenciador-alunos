@@ -1,7 +1,6 @@
 export interface CreateResponsavelComunicacaoInput {
-  nome: string;
+  userId: string;
   telefone?: string;
-  email?: string;
   escolaId: string;
 }
 

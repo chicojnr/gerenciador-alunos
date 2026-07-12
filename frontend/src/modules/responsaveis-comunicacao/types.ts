@@ -2,17 +2,16 @@ import type { Option } from "../../shared/types.js";
 
 export interface ResponsavelComunicacao {
   id: string;
-  nome: string;
+  userId: string;
+  user: { id: string; name: string; email: string };
   telefone: string | null;
-  email: string | null;
   escola: Option;
   ativo: boolean;
 }
 
 export interface CreateResponsavelComunicacaoInput {
-  nome: string;
+  userId: string;
   telefone?: string;
-  email?: string;
   escolaId: string;
 }
 

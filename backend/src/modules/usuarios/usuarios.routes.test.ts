@@ -65,6 +65,19 @@ describe("usuarios routes", () => {
     expect(response.statusCode).toBe(403);
   });
 
+  it("allows non-admin users to read the lightweight options list", async () => {
+    const response = await app.inject({
+      method: "GET",
+      url: "/usuarios/options",
+      headers: { cookie: nonAdminCookie }
+    });
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(Array.isArray(body)).toBe(true);
+    expect(body[0]).toHaveProperty("nome");
+    expect(body[0]).not.toHaveProperty("passwordHash");
+  });
+
   it("creates then lists a usuario, without leaking the password hash", async () => {
     const createRes = await app.inject({
       method: "POST",

@@ -13,6 +13,10 @@ function assertValidName(name: string | undefined) {
 }
 
 export const usuarioService = {
+  listOptions() {
+    return usuarioRepository.listOptions();
+  },
+
   list(page: number, pageSize: number) {
     return usuarioRepository.list(page, pageSize);
   },

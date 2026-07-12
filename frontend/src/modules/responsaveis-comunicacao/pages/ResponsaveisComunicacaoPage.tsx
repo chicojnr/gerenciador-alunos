@@ -5,10 +5,12 @@ import { ResponsavelComunicacaoForm } from "../components/ResponsavelComunicacao
 import { ResponsavelComunicacaoList } from "../components/ResponsavelComunicacaoList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { ResponsavelComunicacao, CreateResponsavelComunicacaoInput } from "../types.js";
 
 export function ResponsaveisComunicacaoPage() {
   const { items, loading, create, update, remove } = useResponsaveisComunicacao();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<ResponsavelComunicacao | null>(null);
 
@@ -28,11 +30,31 @@ export function ResponsaveisComunicacaoPage() {
 
   async function handleSubmit(data: CreateResponsavelComunicacaoInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste responsável por comunicação?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover responsável por comunicação",
+      message: "Tem certeza que deseja remover este responsável por comunicação?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,15 +69,14 @@ export function ResponsaveisComunicacaoPage() {
           Novo Responsável
         </Button>
       </div>
-      <ResponsavelComunicacaoList items={items} onEdit={openEdit} onRemove={remove} />
+      <ResponsavelComunicacaoList items={items} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <ResponsavelComunicacaoForm
           initial={
             editing
               ? {
-                  nome: editing.nome,
+                  userId: editing.user.id,
                   telefone: editing.telefone ?? undefined,
-                  email: editing.email ?? undefined,
                   escolaId: editing.escola.id
                 }
               : undefined

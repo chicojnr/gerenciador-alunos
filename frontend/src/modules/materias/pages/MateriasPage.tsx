@@ -5,10 +5,12 @@ import { MateriaForm } from "../components/MateriaForm.js";
 import { MateriaList } from "../components/MateriaList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Materia, CreateMateriaInput } from "../types.js";
 
 export function MateriasPage() {
   const { materias, loading, create, update, remove } = useMaterias();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Materia | null>(null);
 
@@ -28,11 +30,31 @@ export function MateriasPage() {
 
   async function handleSubmit(data: CreateMateriaInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração desta matéria?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover matéria",
+      message: "Tem certeza que deseja remover esta matéria?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,7 +69,7 @@ export function MateriasPage() {
           Nova Matéria
         </Button>
       </div>
-      <MateriaList materias={materias} onEdit={openEdit} onRemove={remove} />
+      <MateriaList materias={materias} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <MateriaForm
           initial={editing ? { nome: editing.nome } : undefined}

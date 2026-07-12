@@ -5,10 +5,12 @@ import { PeriodoForm } from "../components/PeriodoForm.js";
 import { PeriodoList } from "../components/PeriodoList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Periodo, CreatePeriodoInput } from "../types.js";
 
 export function PeriodosPage() {
   const { periodos, loading, create, update, remove } = usePeriodos();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Periodo | null>(null);
 
@@ -28,11 +30,31 @@ export function PeriodosPage() {
 
   async function handleSubmit(data: CreatePeriodoInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste período?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover período",
+      message: "Tem certeza que deseja remover este período?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,7 +69,7 @@ export function PeriodosPage() {
           Novo Período
         </Button>
       </div>
-      <PeriodoList periodos={periodos} onEdit={openEdit} onRemove={remove} />
+      <PeriodoList periodos={periodos} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <PeriodoForm
           initial={editing ? { nome: editing.nome } : undefined}

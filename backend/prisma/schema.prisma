@@ -13,13 +13,14 @@ enum Role {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         Role     @default(USER)
-  ativo        Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  id                      String                   @id @default(uuid())
+  email                   String                   @unique
+  passwordHash            String
+  name                    String
+  role                    Role                     @default(USER)
+  ativo                   Boolean                  @default(true)
+  createdAt               DateTime                 @default(now())
+  responsaveisComunicacao ResponsavelComunicacao[]
 }
 
 model Escola {
@@ -149,16 +150,20 @@ model CalendarioLetivo {
   updatedAt  DateTime @updatedAt
 }
 
+// O responsável por comunicação deve ser um usuário já cadastrado no
+// sistema — nome/email vêm do User, não são digitados aqui.
 model ResponsavelComunicacao {
   id        String   @id @default(uuid())
-  nome      String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
   telefone  String?
-  email     String?
   escolaId  String
   escola    Escola   @relation(fields: [escolaId], references: [id])
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([userId, escolaId])
 }
 
 model Falta {

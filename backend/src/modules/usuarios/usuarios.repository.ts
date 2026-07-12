@@ -20,6 +20,15 @@ interface CreateUserRow {
 }
 
 export const usuarioRepository = {
+  async listOptions() {
+    const users = await prisma.user.findMany({
+      where: { ativo: true },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" }
+    });
+    return users.map((u) => ({ id: u.id, nome: u.name }));
+  },
+
   async list(page: number, pageSize: number) {
     const [items, total] = await Promise.all([
       prisma.user.findMany({

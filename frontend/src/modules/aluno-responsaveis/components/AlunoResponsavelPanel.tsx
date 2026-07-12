@@ -3,6 +3,7 @@ import { X, Plus } from "lucide-react";
 import { useAlunoResponsaveis } from "../hooks/useAlunoResponsaveis.js";
 import { useResponsavelOptions } from "../../../shared/hooks/useResponsavelOptions.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 
 interface AlunoResponsavelPanelProps {
   alunoId: string;
@@ -14,6 +15,7 @@ const SELECT_CLASSES =
 export function AlunoResponsavelPanel({ alunoId }: AlunoResponsavelPanelProps) {
   const { alunoResponsaveis, loading, create, remove } = useAlunoResponsaveis(alunoId);
   const { responsaveis } = useResponsavelOptions();
+  const confirm = useConfirm();
   const [responsavelId, setResponsavelId] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -28,6 +30,18 @@ export function AlunoResponsavelPanel({ alunoId }: AlunoResponsavelPanelProps) {
       setResponsavelId("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível vincular o responsável.");
+    }
+  }
+
+  async function handleRemove(id: string, responsavelNome: string) {
+    const ok = await confirm({
+      title: "Remover vínculo",
+      message: `Tem certeza que deseja remover o vínculo com "${responsavelNome}"?`,
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
     }
   }
 
@@ -50,7 +64,7 @@ export function AlunoResponsavelPanel({ alunoId }: AlunoResponsavelPanelProps) {
             >
               <span className="font-medium text-zinc-800">{ar.responsavel.nome}</span>
               <button
-                onClick={() => remove(ar.id)}
+                onClick={() => handleRemove(ar.id, ar.responsavel.nome)}
                 aria-label={`Remover ${ar.responsavel.nome}`}
                 className="rounded p-1 text-zinc-400 transition-colors duration-150 hover:bg-zinc-200 hover:text-zinc-700"
               >

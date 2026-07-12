@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { EscolasPage } from "./EscolasPage.js";
 import { escolasService } from "../services/escolas.service.js";
+import { ConfirmProvider } from "../../../shared/contexts/ConfirmContext.js";
 import type { Escola } from "../types.js";
 
 vi.mock("../services/escolas.service.js", () => ({
@@ -25,7 +26,11 @@ describe("EscolasPage", () => {
   it("keeps the modal open and shows an error when create fails", async () => {
     createMock.mockRejectedValueOnce(new Error("Request failed: 400"));
 
-    render(<EscolasPage />);
+    render(
+      <ConfirmProvider>
+        <EscolasPage />
+      </ConfirmProvider>
+    );
     await waitFor(() => expect(screen.getByText("Nova Escola")).toBeTruthy());
 
     fireEvent.click(screen.getByText("Nova Escola"));
@@ -50,7 +55,11 @@ describe("EscolasPage", () => {
     };
     createMock.mockResolvedValueOnce(created);
 
-    render(<EscolasPage />);
+    render(
+      <ConfirmProvider>
+        <EscolasPage />
+      </ConfirmProvider>
+    );
     await waitFor(() => expect(screen.getByText("Nova Escola")).toBeTruthy());
 
     fireEvent.click(screen.getByText("Nova Escola"));

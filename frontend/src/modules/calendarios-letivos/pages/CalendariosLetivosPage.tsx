@@ -5,10 +5,12 @@ import { CalendarioLetivoForm } from "../components/CalendarioLetivoForm.js";
 import { CalendarioLetivoList } from "../components/CalendarioLetivoList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { CalendarioLetivo, CreateCalendarioLetivoInput } from "../types.js";
 
 export function CalendariosLetivosPage() {
   const { calendarios, loading, create, update, remove } = useCalendariosLetivos();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<CalendarioLetivo | null>(null);
 
@@ -28,11 +30,31 @@ export function CalendariosLetivosPage() {
 
   async function handleSubmit(data: CreateCalendarioLetivoInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste calendário letivo?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover calendário letivo",
+      message: "Tem certeza que deseja remover este calendário letivo?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,7 +69,7 @@ export function CalendariosLetivosPage() {
           Novo Calendário
         </Button>
       </div>
-      <CalendarioLetivoList calendarios={calendarios} onEdit={openEdit} onRemove={remove} />
+      <CalendarioLetivoList calendarios={calendarios} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <CalendarioLetivoForm
           initial={

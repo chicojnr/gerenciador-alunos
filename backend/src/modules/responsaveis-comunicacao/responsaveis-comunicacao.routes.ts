@@ -2,7 +2,8 @@ import type { FastifyInstance } from "fastify";
 import {
   responsavelComunicacaoService,
   ResponsavelComunicacaoNotFoundError,
-  ResponsavelComunicacaoValidationError
+  ResponsavelComunicacaoValidationError,
+  ResponsavelComunicacaoDuplicateError
 } from "./responsaveis-comunicacao.service.js";
 import { requireAuth } from "../../core/auth-hook.js";
 import type { Config } from "../../core/config.js";
@@ -50,6 +51,9 @@ export function registerResponsaveisComunicacaoRoutes(app: FastifyInstance, conf
         if (err instanceof ResponsavelComunicacaoValidationError) {
           return reply.code(400).send({ error: err.message });
         }
+        if (err instanceof ResponsavelComunicacaoDuplicateError) {
+          return reply.code(400).send({ error: err.message });
+        }
         throw err;
       }
     }
@@ -66,6 +70,9 @@ export function registerResponsaveisComunicacaoRoutes(app: FastifyInstance, conf
           return reply.code(404).send({ error: "Responsável de comunicação não encontrado" });
         }
         if (err instanceof ResponsavelComunicacaoValidationError) {
+          return reply.code(400).send({ error: err.message });
+        }
+        if (err instanceof ResponsavelComunicacaoDuplicateError) {
           return reply.code(400).send({ error: err.message });
         }
         throw err;

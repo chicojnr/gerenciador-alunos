@@ -17,7 +17,9 @@ export function ResponsavelComunicacaoList({
   return (
     <Table<ResponsavelComunicacao>
       columns={[
-        { key: "nome", header: "Nome" },
+        { key: "user", header: "Usuário", render: (item) => item.user.name },
+        { key: "email", header: "Email", render: (item) => item.user.email },
+        { key: "telefone", header: "Telefone", render: (item) => item.telefone ?? "—" },
         { key: "escola", header: "Escola", render: (item) => item.escola.nome },
         {
           key: "acoes",

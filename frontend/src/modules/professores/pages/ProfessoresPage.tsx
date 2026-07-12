@@ -5,10 +5,12 @@ import { ProfessorForm } from "../components/ProfessorForm.js";
 import { ProfessorList } from "../components/ProfessorList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Professor, CreateProfessorInput } from "../types.js";
 
 export function ProfessoresPage() {
   const { professores, loading, create, update, remove } = useProfessores();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Professor | null>(null);
 
@@ -28,11 +30,31 @@ export function ProfessoresPage() {
 
   async function handleSubmit(data: CreateProfessorInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste professor?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover professor",
+      message: "Tem certeza que deseja remover este professor?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,7 +69,7 @@ export function ProfessoresPage() {
           Novo Professor
         </Button>
       </div>
-      <ProfessorList professores={professores} onEdit={openEdit} onRemove={remove} />
+      <ProfessorList professores={professores} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <ProfessorForm
           initial={

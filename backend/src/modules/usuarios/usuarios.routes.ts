@@ -12,6 +12,13 @@ import type { CreateUsuarioInput, UpdateUsuarioInput } from "./usuarios.types.js
 export function registerUsuariosRoutes(app: FastifyInstance, config: Config) {
   const auth = { preHandler: [requireAuth(config), requireRole("ADMIN")] };
 
+  // Lightweight, any-authenticated-user lookup (id+nome only) so the
+  // Responsável de Comunicação form can pick a registered user without
+  // needing the ADMIN-only full Usuários cadastro access.
+  app.get("/usuarios/options", { preHandler: requireAuth(config) }, async () => {
+    return usuarioService.listOptions();
+  });
+
   app.get<{ Querystring: { page?: string; pageSize?: string } }>(
     "/usuarios",
     auth,

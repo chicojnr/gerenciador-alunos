@@ -5,10 +5,12 @@ import { ResponsavelForm } from "../components/ResponsavelForm.js";
 import { ResponsavelList } from "../components/ResponsavelList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Responsavel, CreateResponsavelInput } from "../types.js";
 
 export function ResponsaveisPage() {
   const { responsaveis, loading, create, update, remove } = useResponsaveis();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Responsavel | null>(null);
 
@@ -28,11 +30,31 @@ export function ResponsaveisPage() {
 
   async function handleSubmit(data: CreateResponsavelInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste responsável?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover responsável",
+      message: "Tem certeza que deseja remover este responsável?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,7 +69,7 @@ export function ResponsaveisPage() {
           Novo Responsável
         </Button>
       </div>
-      <ResponsavelList responsaveis={responsaveis} onEdit={openEdit} onRemove={remove} />
+      <ResponsavelList responsaveis={responsaveis} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <ResponsavelForm
           initial={

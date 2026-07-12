@@ -5,10 +5,12 @@ import { EscolaForm } from "../components/EscolaForm.js";
 import { EscolaList } from "../components/EscolaList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Escola, CreateEscolaInput } from "../types.js";
 
 export function EscolasPage() {
   const { escolas, loading, create, update, remove } = useEscolas();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Escola | null>(null);
 
@@ -28,11 +30,31 @@ export function EscolasPage() {
 
   async function handleSubmit(data: CreateEscolaInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração dos dados desta escola?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover escola",
+      message: "Tem certeza que deseja remover esta escola?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -47,7 +69,7 @@ export function EscolasPage() {
           Nova Escola
         </Button>
       </div>
-      <EscolaList escolas={escolas} onEdit={openEdit} onRemove={remove} />
+      <EscolaList escolas={escolas} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <EscolaForm
           initial={editing ? { nome: editing.nome } : undefined}

@@ -10,6 +10,7 @@ describe("responsaveis-comunicacao routes", () => {
   let app: FastifyInstance;
   let authCookie: string;
   let escolaId: string;
+  let coordenadorUserId: string;
 
   beforeAll(async () => {
     app = await buildApp();
@@ -30,13 +31,23 @@ describe("responsaveis-comunicacao routes", () => {
   beforeEach(async () => {
     await prisma.responsavelComunicacao.deleteMany();
     await prisma.escola.deleteMany({ where: { nome: { contains: "resp-com-test" } } });
+    await prisma.user.deleteMany({ where: { email: { contains: "resp-com-test" } } });
     const escola = await prisma.escola.create({ data: { nome: "Escola resp-com-test" } });
+    const coordenador = await prisma.user.create({
+      data: {
+        email: "coordenador@resp-com-test.com",
+        passwordHash: await hashPassword("x"),
+        name: "Coordenador Teste"
+      }
+    });
     escolaId = escola.id;
+    coordenadorUserId = coordenador.id;
   });
 
   afterAll(async () => {
     await prisma.responsavelComunicacao.deleteMany();
     await prisma.escola.deleteMany({ where: { nome: { contains: "resp-com-test" } } });
+    await prisma.user.deleteMany({ where: { email: { contains: "resp-com-test" } } });
     await app.close();
     await prisma.$disconnect();
   });
@@ -46,15 +57,16 @@ describe("responsaveis-comunicacao routes", () => {
     expect(response.statusCode).toBe(401);
   });
 
-  it("creates then lists a responsavel de comunicacao", async () => {
+  it("creates then lists a responsavel de comunicacao linked to a registered user", async () => {
     const createRes = await app.inject({
       method: "POST",
       url: "/responsaveis-comunicacao",
       headers: { cookie: authCookie },
-      payload: { nome: "Coordenador Teste", escolaId }
+      payload: { userId: coordenadorUserId, escolaId }
     });
     expect(createRes.statusCode).toBe(201);
     expect(createRes.json().escola.id).toBe(escolaId);
+    expect(createRes.json().user.name).toBe("Coordenador Teste");
 
     const listRes = await app.inject({
       method: "GET",
@@ -64,12 +76,38 @@ describe("responsaveis-comunicacao routes", () => {
     expect(listRes.json().items).toHaveLength(1);
   });
 
+  it("rejects a userId that does not belong to a registered user", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: "00000000-0000-0000-0000-000000000000", escolaId }
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
+  it("rejects assigning the same user twice to the same escola", async () => {
+    await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: coordenadorUserId, escolaId }
+    });
+    const response = await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: coordenadorUserId, escolaId }
+    });
+    expect(response.statusCode).toBe(400);
+  });
+
   it("soft-deletes a responsavel de comunicacao", async () => {
     const createRes = await app.inject({
       method: "POST",
       url: "/responsaveis-comunicacao",
       headers: { cookie: authCookie },
-      payload: { nome: "Para Remover", escolaId }
+      payload: { userId: coordenadorUserId, escolaId }
     });
     const { id } = createRes.json();
 

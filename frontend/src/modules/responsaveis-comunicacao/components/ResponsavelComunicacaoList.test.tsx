@@ -8,9 +8,9 @@ describe("ResponsavelComunicacaoList", () => {
     const items: ResponsavelComunicacao[] = [
       {
         id: "1",
-        nome: "Coordenador",
+        userId: "u1",
+        user: { id: "u1", name: "Coordenador", email: "coordenador@example.com" },
         telefone: null,
-        email: null,
         escola: { id: "e1", nome: "Escola A" },
         ativo: true
       }
@@ -21,6 +21,7 @@ describe("ResponsavelComunicacaoList", () => {
     render(<ResponsavelComunicacaoList items={items} onEdit={onEdit} onRemove={onRemove} />);
 
     expect(screen.getByText("Coordenador")).toBeTruthy();
+    expect(screen.getByText("coordenador@example.com")).toBeTruthy();
 
     fireEvent.click(screen.getByText("Editar"));
     expect(onEdit).toHaveBeenCalledWith(items[0]);

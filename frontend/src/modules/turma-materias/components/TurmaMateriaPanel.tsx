@@ -4,6 +4,7 @@ import { useTurmaMaterias } from "../hooks/useTurmaMaterias.js";
 import { useMateriaOptions } from "../../../shared/hooks/useMateriaOptions.js";
 import { useProfessorOptions } from "../../../shared/hooks/useProfessorOptions.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 
 interface TurmaMateriaPanelProps {
   turmaId: string;
@@ -14,6 +15,7 @@ const SELECT_CLASSES =
 
 export function TurmaMateriaPanel({ turmaId }: TurmaMateriaPanelProps) {
   const { turmaMaterias, loading, create, remove } = useTurmaMaterias(turmaId);
+  const confirm = useConfirm();
   const { materias } = useMateriaOptions();
   const { professores } = useProfessorOptions();
   const [materiaId, setMateriaId] = useState("");
@@ -32,6 +34,18 @@ export function TurmaMateriaPanel({ turmaId }: TurmaMateriaPanelProps) {
       setProfessorId("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível atribuir a matéria.");
+    }
+  }
+
+  async function handleRemove(id: string, materiaNome: string) {
+    const ok = await confirm({
+      title: "Remover atribuição",
+      message: `Tem certeza que deseja remover "${materiaNome}" desta turma?`,
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
     }
   }
 
@@ -57,7 +71,7 @@ export function TurmaMateriaPanel({ turmaId }: TurmaMateriaPanelProps) {
                 <span className="text-zinc-400"> — {tm.professor.nome}</span>
               </span>
               <button
-                onClick={() => remove(tm.id)}
+                onClick={() => handleRemove(tm.id, tm.materia.nome)}
                 aria-label={`Remover ${tm.materia.nome}`}
                 className="rounded p-1 text-zinc-400 transition-colors duration-150 hover:bg-zinc-200 hover:text-zinc-700"
               >

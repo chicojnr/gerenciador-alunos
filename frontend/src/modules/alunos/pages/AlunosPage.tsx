@@ -6,10 +6,12 @@ import { AlunoList } from "../components/AlunoList.js";
 import { AlunoResponsavelPanel } from "../../aluno-responsaveis/components/AlunoResponsavelPanel.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Aluno, CreateAlunoInput } from "../types.js";
 
 export function AlunosPage() {
   const { alunos, loading, create, update, remove } = useAlunos();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Aluno | null>(null);
 
@@ -29,11 +31,31 @@ export function AlunosPage() {
 
   async function handleSubmit(data: CreateAlunoInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste aluno?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover aluno",
+      message: "Tem certeza que deseja remover este aluno?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -48,7 +70,7 @@ export function AlunosPage() {
           Novo Aluno
         </Button>
       </div>
-      <AlunoList alunos={alunos} onEdit={openEdit} onRemove={remove} />
+      <AlunoList alunos={alunos} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <AlunoForm
           initial={

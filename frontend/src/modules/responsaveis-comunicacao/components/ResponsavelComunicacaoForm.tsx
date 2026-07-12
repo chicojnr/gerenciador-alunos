@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Button } from "../../../shared/components/Button.js";
 import { useEscolaOptions } from "../../../shared/hooks/useEscolaOptions.js";
+import { useUsuarioOptions } from "../../../shared/hooks/useUsuarioOptions.js";
 import type { CreateResponsavelComunicacaoInput } from "../types.js";
 
 interface ResponsavelComunicacaoFormProps {
@@ -18,9 +19,9 @@ export function ResponsavelComunicacaoForm({
   onSubmit
 }: ResponsavelComunicacaoFormProps) {
   const { escolas, loading: loadingEscolas } = useEscolaOptions();
-  const [nome, setNome] = useState(initial?.nome ?? "");
+  const { usuarios, loading: loadingUsuarios } = useUsuarioOptions();
+  const [userId, setUserId] = useState(initial?.userId ?? "");
   const [telefone, setTelefone] = useState(initial?.telefone ?? "");
-  const [email, setEmail] = useState(initial?.email ?? "");
   const [escolaId, setEscolaId] = useState(initial?.escolaId ?? "");
   const [error, setError] = useState<string | null>(null);
 
@@ -28,11 +29,10 @@ export function ResponsavelComunicacaoForm({
     e.preventDefault();
     setError(null);
     try {
-      await onSubmit({ nome, telefone: telefone || undefined, email: email || undefined, escolaId });
+      await onSubmit({ userId, telefone: telefone || undefined, escolaId });
       if (!initial) {
-        setNome("");
+        setUserId("");
         setTelefone("");
-        setEmail("");
         setEscolaId("");
       }
     } catch (err) {
@@ -42,23 +42,23 @@ export function ResponsavelComunicacaoForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
-        placeholder="Nome"
+      <select
+        value={userId}
+        onChange={(e) => setUserId(e.target.value)}
+        disabled={loadingUsuarios}
         className={INPUT_CLASSES}
-      />
+      >
+        <option value="">Selecione um usuário cadastrado</option>
+        {usuarios.map((usuario) => (
+          <option key={usuario.id} value={usuario.id}>
+            {usuario.nome}
+          </option>
+        ))}
+      </select>
       <input
         value={telefone}
         onChange={(e) => setTelefone(e.target.value)}
         placeholder="Telefone (opcional)"
-        className={INPUT_CLASSES}
-      />
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email (opcional)"
         className={INPUT_CLASSES}
       />
       <select

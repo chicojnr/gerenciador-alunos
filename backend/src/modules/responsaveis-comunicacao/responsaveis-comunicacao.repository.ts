@@ -4,7 +4,10 @@ import type {
   UpdateResponsavelComunicacaoInput
 } from "./responsaveis-comunicacao.types.js";
 
-const INCLUDE = { escola: { select: { id: true, nome: true } } } as const;
+const INCLUDE = {
+  escola: { select: { id: true, nome: true } },
+  user: { select: { id: true, name: true, email: true } }
+} as const;
 
 export const responsavelComunicacaoRepository = {
   async list(page: number, pageSize: number) {
@@ -14,7 +17,7 @@ export const responsavelComunicacaoRepository = {
         include: INCLUDE,
         skip: (page - 1) * pageSize,
         take: pageSize,
-        orderBy: { nome: "asc" }
+        orderBy: { user: { name: "asc" } }
       }),
       prisma.responsavelComunicacao.count({ where: { ativo: true } })
     ]);

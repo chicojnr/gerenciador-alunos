@@ -6,10 +6,12 @@ import { TurmaList } from "../components/TurmaList.js";
 import { TurmaMateriaPanel } from "../../turma-materias/components/TurmaMateriaPanel.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Turma, CreateTurmaInput } from "../types.js";
 
 export function TurmasPage() {
   const { turmas, loading, create, update, remove } = useTurmas();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Turma | null>(null);
 
@@ -29,11 +31,31 @@ export function TurmasPage() {
 
   async function handleSubmit(data: CreateTurmaInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração desta turma?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover turma",
+      message: "Tem certeza que deseja remover esta turma?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -48,7 +70,7 @@ export function TurmasPage() {
           Nova Turma
         </Button>
       </div>
-      <TurmaList turmas={turmas} onEdit={openEdit} onRemove={remove} />
+      <TurmaList turmas={turmas} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <TurmaForm
           initial={

@@ -5,10 +5,12 @@ import { TemplateForm } from "../components/TemplateForm.js";
 import { TemplateList } from "../components/TemplateList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Template, CreateTemplateInput } from "../types.js";
 
 export function TemplatesPage() {
   const { templates, loading, error, create, update, remove } = useTemplates();
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Template | null>(null);
 
@@ -36,11 +38,31 @@ export function TemplatesPage() {
 
   async function handleSubmit(data: CreateTemplateInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste template?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover template",
+      message: "Tem certeza que deseja remover este template?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -55,7 +77,7 @@ export function TemplatesPage() {
           Novo Template
         </Button>
       </div>
-      <TemplateList templates={templates} onEdit={openEdit} onRemove={remove} />
+      <TemplateList templates={templates} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <TemplateForm
           initial={editing ? { nome: editing.nome, conteudo: editing.conteudo } : undefined}

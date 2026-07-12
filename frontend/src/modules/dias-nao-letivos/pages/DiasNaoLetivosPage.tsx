@@ -6,6 +6,7 @@ import { DiaNaoLetivoForm } from "../components/DiaNaoLetivoForm.js";
 import { DiaNaoLetivoList } from "../components/DiaNaoLetivoList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { CreateDiaNaoLetivoInput } from "../types.js";
 
 const SELECT_CLASSES =
@@ -15,11 +16,24 @@ export function DiasNaoLetivosPage() {
   const { escolas, loading: loadingEscolas } = useEscolaOptions();
   const [escolaId, setEscolaId] = useState("");
   const { dias, loading, error, create, remove } = useDiasNaoLetivos(escolaId);
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
 
   async function handleSubmit(data: CreateDiaNaoLetivoInput) {
     await create(data);
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover dia não letivo",
+      message: "Tem certeza que deseja remover este dia não letivo?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -64,7 +78,7 @@ export function DiasNaoLetivosPage() {
       ) : loading ? (
         <p className="text-zinc-500">Carregando...</p>
       ) : (
-        <DiaNaoLetivoList dias={dias} onRemove={remove} />
+        <DiaNaoLetivoList dias={dias} onRemove={handleRemove} />
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>

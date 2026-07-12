@@ -6,6 +6,7 @@ import { IndicadorForm } from "../components/IndicadorForm.js";
 import { IndicadorList } from "../components/IndicadorList.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
+import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Indicador, CreateIndicadorInput } from "../types.js";
 
 const SELECT_CLASSES =
@@ -17,6 +18,7 @@ export function IndicadoresPage() {
   const { indicadores, loading, error, create, update, remove } = useIndicadores(
     escolaId || undefined
   );
+  const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Indicador | null>(null);
 
@@ -32,11 +34,31 @@ export function IndicadoresPage() {
 
   async function handleSubmit(data: CreateIndicadorInput) {
     if (editing) {
+      const ok = await confirm({
+        title: "Salvar alterações",
+        message: "Confirma a alteração deste indicador?",
+        confirmLabel: "Salvar"
+      });
+      if (!ok) {
+        return;
+      }
       await update(editing.id, data);
     } else {
       await create(data);
     }
     setModalOpen(false);
+  }
+
+  async function handleRemove(id: string) {
+    const ok = await confirm({
+      title: "Remover indicador",
+      message: "Tem certeza que deseja remover este indicador?",
+      confirmLabel: "Remover",
+      variant: "danger"
+    });
+    if (ok) {
+      await remove(id);
+    }
   }
 
   return (
@@ -77,7 +99,7 @@ export function IndicadoresPage() {
       {loading ? (
         <p className="text-zinc-500">Carregando...</p>
       ) : (
-        <IndicadorList indicadores={indicadores} onEdit={openEdit} onRemove={remove} />
+        <IndicadorList indicadores={indicadores} onEdit={openEdit} onRemove={handleRemove} />
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
