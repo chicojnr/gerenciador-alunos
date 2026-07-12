@@ -107,6 +107,39 @@ describe("usuarios routes", () => {
     expect(created.passwordHash).toBeUndefined();
   });
 
+  it("updates name, email, role and password via PUT", async () => {
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/usuarios",
+      headers: { cookie: adminCookie },
+      payload: {
+        name: "Editar Antes",
+        email: "editar-antes@usuarios-routes-crud-test.com",
+        password: "senha-forte-123",
+        role: "USER"
+      }
+    });
+    const { id } = createRes.json();
+
+    const updateRes = await app.inject({
+      method: "PUT",
+      url: `/usuarios/${id}`,
+      headers: { cookie: adminCookie },
+      payload: {
+        name: "Editar Depois",
+        email: "editar-depois@usuarios-routes-crud-test.com",
+        role: "ADMIN",
+        password: "senha-nova-456"
+      }
+    });
+    expect(updateRes.statusCode).toBe(200);
+    const body = updateRes.json();
+    expect(body.name).toBe("Editar Depois");
+    expect(body.email).toBe("editar-depois@usuarios-routes-crud-test.com");
+    expect(body.role).toBe("ADMIN");
+    expect(body.passwordHash).toBeUndefined();
+  });
+
   it("rejects deactivating your own account", async () => {
     const response = await app.inject({
       method: "DELETE",

@@ -5,6 +5,7 @@ import {
   UsuarioNotFoundError,
   CannotDeactivateSelfError
 } from "./usuarios.service.js";
+import { comparePassword } from "../../core/password.js";
 
 describe("usuarioService", () => {
   beforeEach(async () => {
@@ -99,6 +100,73 @@ describe("usuarioService", () => {
         role: "USER"
       })
     ).rejects.toThrow();
+  });
+
+  it("updates name, email, role and password on an existing usuario", async () => {
+    const created = await usuarioService.create({
+      name: "Antes",
+      email: "antes@usuarios-service-test.com",
+      password: "senha-forte-123",
+      role: "USER"
+    });
+
+    const updated = await usuarioService.update(created.id, {
+      name: "Depois",
+      email: "depois@usuarios-service-test.com",
+      role: "ADMIN",
+      password: "senha-nova-456"
+    });
+    expect(updated.name).toBe("Depois");
+    expect(updated.email).toBe("depois@usuarios-service-test.com");
+    expect(updated.role).toBe("ADMIN");
+    expect((updated as { passwordHash?: string }).passwordHash).toBeUndefined();
+
+    const row = await prisma.user.findUniqueOrThrow({ where: { id: created.id } });
+    expect(await comparePassword("senha-nova-456", row.passwordHash)).toBe(true);
+  });
+
+  it("keeps the existing password when updating without a new one", async () => {
+    const created = await usuarioService.create({
+      name: "Mantem Senha",
+      email: "mantem-senha@usuarios-service-test.com",
+      password: "senha-forte-123",
+      role: "USER"
+    });
+
+    await usuarioService.update(created.id, { name: "Mantem Senha Editado" });
+
+    const row = await prisma.user.findUniqueOrThrow({ where: { id: created.id } });
+    expect(await comparePassword("senha-forte-123", row.passwordHash)).toBe(true);
+  });
+
+  it("rejects updating to an email already used by another usuario", async () => {
+    await usuarioService.create({
+      name: "Dono do Email",
+      email: "ocupado@usuarios-service-test.com",
+      password: "senha-forte-123",
+      role: "USER"
+    });
+    const other = await usuarioService.create({
+      name: "Outro",
+      email: "outro@usuarios-service-test.com",
+      password: "senha-forte-123",
+      role: "USER"
+    });
+
+    await expect(
+      usuarioService.update(other.id, { email: "ocupado@usuarios-service-test.com" })
+    ).rejects.toThrow();
+  });
+
+  it("rejects updating to a short password", async () => {
+    const created = await usuarioService.create({
+      name: "Senha Curta Update",
+      email: "senha-curta-update@usuarios-service-test.com",
+      password: "senha-forte-123",
+      role: "USER"
+    });
+
+    await expect(usuarioService.update(created.id, { password: "1234567" })).rejects.toThrow();
   });
 
   it("rejects an admin deactivating their own account", async () => {

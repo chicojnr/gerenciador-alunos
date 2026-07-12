@@ -1,6 +1,5 @@
 import { prisma } from "../../core/prisma.js";
 import type { Role } from "@prisma/client";
-import type { UpdateUsuarioInput } from "./usuarios.types.js";
 
 // Never select passwordHash — no route in this module should ever return it.
 const SAFE_SELECT = {
@@ -17,6 +16,13 @@ interface CreateUserRow {
   email: string;
   passwordHash: string;
   role: Role;
+}
+
+interface UpdateUserRow {
+  name?: string;
+  email?: string;
+  passwordHash?: string;
+  role?: Role;
 }
 
 export const usuarioRepository = {
@@ -55,7 +61,7 @@ export const usuarioRepository = {
     return prisma.user.create({ data, select: SAFE_SELECT });
   },
 
-  update(id: string, data: UpdateUsuarioInput) {
+  update(id: string, data: UpdateUserRow) {
     return prisma.user.update({ where: { id }, data, select: SAFE_SELECT });
   },
 

@@ -4,7 +4,7 @@ import type { CreateUsuarioInput, UpdateUsuarioInput, Role } from "../types.js";
 
 interface UsuarioFormProps {
   mode: "create" | "edit";
-  initial?: { name: string; role: Role };
+  initial?: { name: string; email: string; role: Role };
   submitLabel: string;
   onSubmit: (data: CreateUsuarioInput | UpdateUsuarioInput) => Promise<void>;
 }
@@ -14,7 +14,7 @@ const INPUT_CLASSES =
 
 export function UsuarioForm({ mode, initial, submitLabel, onSubmit }: UsuarioFormProps) {
   const [name, setName] = useState(initial?.name ?? "");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(initial?.email ?? "");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<Role>(initial?.role ?? "USER");
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +30,8 @@ export function UsuarioForm({ mode, initial, submitLabel, onSubmit }: UsuarioFor
         setPassword("");
         setRole("USER");
       } else {
-        await onSubmit({ name, role });
+        await onSubmit({ name, email, role, ...(password ? { password } : {}) });
+        setPassword("");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível salvar o usuário.");
@@ -45,24 +46,20 @@ export function UsuarioForm({ mode, initial, submitLabel, onSubmit }: UsuarioFor
         placeholder="Nome"
         className={INPUT_CLASSES}
       />
-      {mode === "create" && (
-        <>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            className={INPUT_CLASSES}
-          />
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Senha inicial"
-            className={INPUT_CLASSES}
-          />
-        </>
-      )}
+      <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Email"
+        className={INPUT_CLASSES}
+      />
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder={mode === "create" ? "Senha inicial" : "Nova senha (deixe em branco para manter)"}
+        className={INPUT_CLASSES}
+      />
       <select value={role} onChange={(e) => setRole(e.target.value as Role)} className={INPUT_CLASSES}>
         <option value="USER">Usuário</option>
         <option value="ADMIN">Admin</option>

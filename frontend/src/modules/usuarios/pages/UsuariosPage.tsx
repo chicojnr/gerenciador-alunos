@@ -73,7 +73,7 @@ export function UsuariosPage() {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <UsuarioForm
           mode={editing ? "edit" : "create"}
-          initial={editing ? { name: editing.name, role: editing.role } : undefined}
+          initial={editing ? { name: editing.name, email: editing.email, role: editing.role } : undefined}
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
         />

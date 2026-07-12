@@ -55,7 +55,31 @@ export const usuarioService = {
   async update(id: string, data: UpdateUsuarioInput) {
     assertValidName(data.name);
     await this.getById(id);
-    return usuarioRepository.update(id, data);
+
+    if (data.email !== undefined) {
+      if (data.email.trim().length === 0) {
+        throw new UsuarioValidationError("email não pode ser vazio");
+      }
+      const existing = await usuarioRepository.findByEmail(data.email);
+      if (existing && existing.id !== id) {
+        throw new UsuarioValidationError("email já está em uso");
+      }
+    }
+
+    let passwordHash: string | undefined;
+    if (data.password !== undefined) {
+      if (data.password.length < 8) {
+        throw new UsuarioValidationError("senha deve ter pelo menos 8 caracteres");
+      }
+      passwordHash = await hashPassword(data.password);
+    }
+
+    return usuarioRepository.update(id, {
+      name: data.name,
+      email: data.email,
+      role: data.role,
+      passwordHash
+    });
   },
 
   async remove(id: string, requestingUserId: string) {
