@@ -11,11 +11,21 @@ import {
   Contact,
   CalendarDays,
   MessageCircle,
-  LogOut
+  LogOut,
+  LayoutDashboard,
+  CalendarX2,
+  AlertTriangle,
+  LineChart,
+  MessagesSquare,
+  SlidersHorizontal
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.js";
 
 const NAV_ITEMS = [
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
+  { to: "/faltas", label: "Faltas", icon: CalendarX2, adminOnly: false },
+  { to: "/alertas", label: "Alertas", icon: AlertTriangle, adminOnly: false },
+  { to: "/desempenho", label: "Desempenho", icon: LineChart, adminOnly: false },
   { to: "/escolas", label: "Escolas", icon: Building2, adminOnly: true },
   { to: "/periodos", label: "Períodos", icon: Clock, adminOnly: false },
   { to: "/materias", label: "Matérias", icon: BookOpen, adminOnly: false },
@@ -30,6 +40,8 @@ const NAV_ITEMS = [
     icon: MessageCircle,
     adminOnly: false
   },
+  { to: "/templates", label: "Templates", icon: MessagesSquare, adminOnly: false },
+  { to: "/indicadores", label: "Indicadores", icon: SlidersHorizontal, adminOnly: false },
   { to: "/usuarios", label: "Usuários", icon: Users, adminOnly: true }
 ];
 

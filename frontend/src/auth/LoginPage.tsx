@@ -18,7 +18,7 @@ export function LoginPage() {
     setError(null);
     try {
       await login(email, password);
-      navigate("/periodos");
+      navigate("/dashboard");
     } catch {
       setError("Credenciais inválidas");
     }

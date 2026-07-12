@@ -13,6 +13,12 @@ import { AlunosPage } from "./modules/alunos/pages/AlunosPage.js";
 import { ResponsaveisPage } from "./modules/responsaveis/pages/ResponsaveisPage.js";
 import { CalendariosLetivosPage } from "./modules/calendarios-letivos/pages/CalendariosLetivosPage.js";
 import { ResponsaveisComunicacaoPage } from "./modules/responsaveis-comunicacao/pages/ResponsaveisComunicacaoPage.js";
+import { DashboardPage } from "./modules/dashboard/pages/DashboardPage.js";
+import { FaltasPage } from "./modules/faltas/pages/FaltasPage.js";
+import { AlertasPage } from "./modules/indicadores/pages/AlertasPage.js";
+import { IndicadoresPage } from "./modules/indicadores/pages/IndicadoresPage.js";
+import { DesempenhoPage } from "./modules/notas/pages/DesempenhoPage.js";
+import { TemplatesPage } from "./modules/mensagens/pages/TemplatesPage.js";
 
 export const router = createBrowserRouter([
   { path: "/login", element: <LoginPage /> },
@@ -32,6 +38,12 @@ export const router = createBrowserRouter([
           </AdminRoute>
         )
       },
+      { path: "dashboard", element: <DashboardPage /> },
+      { path: "faltas", element: <FaltasPage /> },
+      { path: "alertas", element: <AlertasPage /> },
+      { path: "desempenho", element: <DesempenhoPage /> },
+      { path: "templates", element: <TemplatesPage /> },
+      { path: "indicadores", element: <IndicadoresPage /> },
       { path: "periodos", element: <PeriodosPage /> },
       { path: "materias", element: <MateriasPage /> },
       { path: "professores", element: <ProfessoresPage /> },
