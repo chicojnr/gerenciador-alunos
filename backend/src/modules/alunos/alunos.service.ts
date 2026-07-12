@@ -14,8 +14,8 @@ function assertValid(data: { nome?: string; turmaId?: string }) {
 }
 
 export const alunoService = {
-  list(page: number, pageSize: number) {
-    return alunoRepository.list(page, pageSize);
+  list(page: number, pageSize: number, turmaId?: string) {
+    return alunoRepository.list(page, pageSize, turmaId);
   },
 
   async getById(id: string) {

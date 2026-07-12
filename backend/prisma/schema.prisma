@@ -53,6 +53,7 @@ model Materia {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   turmaMaterias TurmaMateria[]
+  notas         Nota[]
 }
 
 model Professor {
@@ -106,6 +107,9 @@ model Aluno {
   createdAt      DateTime           @default(now())
   updatedAt      DateTime           @updatedAt
   responsaveis   AlunoResponsavel[]
+  faltas         Falta[]
+  notas          Nota[]
+  envios         EnvioMensagem[]
 }
 
 model Responsavel {
@@ -117,6 +121,7 @@ model Responsavel {
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
   alunos    AlunoResponsavel[]
+  envios    EnvioMensagem[]
 }
 
 model AlunoResponsavel {
@@ -152,4 +157,68 @@ model ResponsavelComunicacao {
   ativo     Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Falta {
+  id        String   @id @default(uuid())
+  alunoId   String
+  aluno     Aluno    @relation(fields: [alunoId], references: [id])
+  data      DateTime @db.Date
+  createdAt DateTime @default(now())
+
+  @@unique([alunoId, data])
+}
+
+enum TipoIndicador {
+  CONSECUTIVAS
+  NAO_CONSECUTIVAS
+}
+
+model IndicadorFalta {
+  id         String        @id @default(uuid())
+  nome       String
+  tipo       TipoIndicador
+  quantidade Int
+  janelaDias Int?
+  ativo      Boolean       @default(true)
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+}
+
+model Nota {
+  id        String   @id @default(uuid())
+  alunoId   String
+  aluno     Aluno    @relation(fields: [alunoId], references: [id])
+  materiaId String
+  materia   Materia  @relation(fields: [materiaId], references: [id])
+  bimestre  Int
+  valor     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([alunoId, materiaId, bimestre])
+}
+
+model MensagemTemplate {
+  id        String          @id @default(uuid())
+  nome      String          @unique
+  conteudo  String
+  ativo     Boolean         @default(true)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  envios    EnvioMensagem[]
+}
+
+model EnvioMensagem {
+  id            String           @id @default(uuid())
+  templateId    String
+  template      MensagemTemplate @relation(fields: [templateId], references: [id])
+  alunoId       String
+  aluno         Aluno            @relation(fields: [alunoId], references: [id])
+  responsavelId String
+  responsavel   Responsavel      @relation(fields: [responsavelId], references: [id])
+  telefone      String?
+  mensagem      String
+  status        String           @default("REGISTRADO")
+  createdAt     DateTime         @default(now())
 }

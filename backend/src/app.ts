@@ -15,6 +15,11 @@ import { registerResponsaveisRoutes } from "./modules/responsaveis/responsaveis.
 import { registerAlunoResponsaveisRoutes } from "./modules/aluno-responsaveis/aluno-responsaveis.routes.js";
 import { registerCalendariosLetivosRoutes } from "./modules/calendarios-letivos/calendarios-letivos.routes.js";
 import { registerResponsaveisComunicacaoRoutes } from "./modules/responsaveis-comunicacao/responsaveis-comunicacao.routes.js";
+import { registerFaltasRoutes } from "./modules/faltas/faltas.routes.js";
+import { registerIndicadoresRoutes } from "./modules/indicadores/indicadores.routes.js";
+import { registerNotasRoutes } from "./modules/notas/notas.routes.js";
+import { registerMensagensRoutes } from "./modules/mensagens/mensagens.routes.js";
+import { registerDashboardRoutes } from "./modules/dashboard/dashboard.routes.js";
 
 export async function buildApp(): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
@@ -38,6 +43,11 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerAlunoResponsaveisRoutes(app, config);
   registerCalendariosLetivosRoutes(app, config);
   registerResponsaveisComunicacaoRoutes(app, config);
+  registerFaltasRoutes(app, config);
+  registerIndicadoresRoutes(app, config);
+  registerNotasRoutes(app, config);
+  registerMensagensRoutes(app, config);
+  registerDashboardRoutes(app, config);
 
   return app;
 }

@@ -7,11 +7,15 @@ import type { CreateAlunoInput, UpdateAlunoInput } from "./alunos.types.js";
 export function registerAlunosRoutes(app: FastifyInstance, config: Config) {
   const auth = { preHandler: requireAuth(config) };
 
-  app.get<{ Querystring: { page?: string; pageSize?: string } }>("/alunos", auth, async (request) => {
-    const page = Number(request.query.page ?? 1);
-    const pageSize = Number(request.query.pageSize ?? 20);
-    return alunoService.list(page, pageSize);
-  });
+  app.get<{ Querystring: { page?: string; pageSize?: string; turmaId?: string } }>(
+    "/alunos",
+    auth,
+    async (request) => {
+      const page = Number(request.query.page ?? 1);
+      const pageSize = Number(request.query.pageSize ?? 20);
+      return alunoService.list(page, pageSize, request.query.turmaId);
+    }
+  );
 
   app.get<{ Params: { id: string } }>("/alunos/:id", auth, async (request, reply) => {
     try {

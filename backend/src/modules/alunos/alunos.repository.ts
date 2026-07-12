@@ -20,16 +20,17 @@ function toUpdateData(data: UpdateAlunoInput) {
 }
 
 export const alunoRepository = {
-  async list(page: number, pageSize: number) {
+  async list(page: number, pageSize: number, turmaId?: string) {
+    const where = { ativo: true, ...(turmaId ? { turmaId } : {}) };
     const [items, total] = await Promise.all([
       prisma.aluno.findMany({
-        where: { ativo: true },
+        where,
         include: INCLUDE,
         skip: (page - 1) * pageSize,
         take: pageSize,
         orderBy: { nome: "asc" }
       }),
-      prisma.aluno.count({ where: { ativo: true } })
+      prisma.aluno.count({ where })
     ]);
     return { items, total };
   },
