@@ -32,5 +32,5 @@ export function useAlunos() {
     await refresh();
   }
 
-  return { alunos, loading, create, update, remove };
+  return { alunos, loading, create, update, remove, refresh };
 }

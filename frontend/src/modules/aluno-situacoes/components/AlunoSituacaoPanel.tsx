@@ -6,6 +6,7 @@ import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 
 interface AlunoSituacaoPanelProps {
   alunoId: string;
+  onChanged?: () => void;
 }
 
 const SELECT_CLASSES =
@@ -15,7 +16,7 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("pt-BR", { timeZone: "UTC" });
 }
 
-export function AlunoSituacaoPanel({ alunoId }: AlunoSituacaoPanelProps) {
+export function AlunoSituacaoPanel({ alunoId, onChanged }: AlunoSituacaoPanelProps) {
   const { historico, loading, change } = useAlunoSituacoes(alunoId);
   const { situacoes } = useSituacaoOptions();
   const confirm = useConfirm();
@@ -47,6 +48,7 @@ export function AlunoSituacaoPanel({ alunoId }: AlunoSituacaoPanelProps) {
       await change({ situacaoId, dataMudanca, observacao: observacao || undefined });
       setSituacaoId("");
       setObservacao("");
+      onChanged?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Não foi possível mudar a situação.");
     }

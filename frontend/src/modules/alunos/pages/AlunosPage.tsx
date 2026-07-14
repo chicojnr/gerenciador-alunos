@@ -11,7 +11,7 @@ import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Aluno, CreateAlunoInput } from "../types.js";
 
 export function AlunosPage() {
-  const { alunos, loading, create, update, remove } = useAlunos();
+  const { alunos, loading, create, update, remove, refresh } = useAlunos();
   const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Aluno | null>(null);
@@ -87,7 +87,7 @@ export function AlunosPage() {
           onSubmit={handleSubmit}
         />
         {editing && <AlunoResponsavelPanel alunoId={editing.id} />}
-        {editing && <AlunoSituacaoPanel alunoId={editing.id} />}
+        {editing && <AlunoSituacaoPanel alunoId={editing.id} onChanged={refresh} />}
       </Modal>
     </div>
   );
