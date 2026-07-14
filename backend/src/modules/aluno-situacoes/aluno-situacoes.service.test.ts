@@ -56,6 +56,29 @@ describe("alunoSituacaoService", () => {
     expect(historico[0].situacao.nome).toBe("Transferido");
   });
 
+  it("orders history by when the change was recorded, not by dataMudanca", async () => {
+    // Backdated/postdated correction: a change recorded later can carry an
+    // earlier dataMudanca than a previous entry. The most recently recorded
+    // change must still be the one reported as "current" — it's what
+    // Aluno.situacaoAtualId was actually set to.
+    await alunoSituacaoService.changeSituacao(alunoId, {
+      situacaoId: transferidoId,
+      dataMudanca: "2026-12-31"
+    });
+
+    const ativoId = (await situacaoAlunoService.findByNome("Ativo"))!.id;
+    await alunoSituacaoService.changeSituacao(alunoId, {
+      situacaoId: ativoId,
+      dataMudanca: "2026-01-01"
+    });
+
+    const aluno = await alunoService.getById(alunoId);
+    expect(aluno.situacaoAtual.nome).toBe("Ativo");
+
+    const historico = await alunoSituacaoService.listByAluno(alunoId);
+    expect(historico[0].situacao.nome).toBe("Ativo");
+  });
+
   it("rejects changing to an inactive situacao", async () => {
     const custom = await situacaoAlunoService.create({ nome: "Descartada aluno-sit-test" });
     await situacaoAlunoService.remove(custom.id);

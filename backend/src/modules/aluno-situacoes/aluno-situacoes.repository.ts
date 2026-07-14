@@ -6,10 +6,15 @@ const INCLUDE = {
 
 export const alunoSituacaoRepository = {
   listByAluno(alunoId: string) {
+    // Ordered by createdAt, not dataMudanca: dataMudanca is a user-editable
+    // effective date (can be backdated/postdated for corrections), so it
+    // isn't reliable for determining which entry is current. createdAt
+    // reflects the actual order changes were recorded, which always
+    // matches whatever Aluno.situacaoAtualId was last set to.
     return prisma.alunoSituacaoHistorico.findMany({
       where: { alunoId },
       include: INCLUDE,
-      orderBy: { dataMudanca: "desc" }
+      orderBy: { createdAt: "desc" }
     });
   },
 
