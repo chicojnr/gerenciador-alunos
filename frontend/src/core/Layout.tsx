@@ -18,7 +18,8 @@ import {
   LineChart,
   MessagesSquare,
   SlidersHorizontal,
-  CalendarOff
+  CalendarOff,
+  Repeat2
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.js";
 
@@ -33,6 +34,7 @@ const NAV_ITEMS = [
   { to: "/professores", label: "Professores", icon: UserRound, adminOnly: false },
   { to: "/turmas", label: "Turmas", icon: Layers, adminOnly: false },
   { to: "/alunos", label: "Alunos", icon: StudentIcon, adminOnly: false },
+  { to: "/situacoes-aluno", label: "Situações", icon: Repeat2, adminOnly: false },
   { to: "/responsaveis", label: "Pais/Responsáveis", icon: Contact, adminOnly: false },
   { to: "/calendarios-letivos", label: "Calendário Letivo", icon: CalendarDays, adminOnly: false },
   { to: "/dias-nao-letivos", label: "Dias Não Letivos", icon: CalendarOff, adminOnly: false },
