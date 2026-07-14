@@ -4,6 +4,7 @@ import { useAlunos } from "../hooks/useAlunos.js";
 import { AlunoForm } from "../components/AlunoForm.js";
 import { AlunoList } from "../components/AlunoList.js";
 import { AlunoResponsavelPanel } from "../../aluno-responsaveis/components/AlunoResponsavelPanel.js";
+import { AlunoSituacaoPanel } from "../../aluno-situacoes/components/AlunoSituacaoPanel.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
 import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
@@ -86,6 +87,7 @@ export function AlunosPage() {
           onSubmit={handleSubmit}
         />
         {editing && <AlunoResponsavelPanel alunoId={editing.id} />}
+        {editing && <AlunoSituacaoPanel alunoId={editing.id} />}
       </Modal>
     </div>
   );

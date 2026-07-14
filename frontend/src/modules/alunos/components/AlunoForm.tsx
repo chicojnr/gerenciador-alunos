@@ -15,7 +15,9 @@ const INPUT_CLASSES =
 export function AlunoForm({ initial, submitLabel, onSubmit }: AlunoFormProps) {
   const { turmas, loading: loadingTurmas } = useTurmaOptions();
   const [nome, setNome] = useState(initial?.nome ?? "");
-  const [dataNascimento, setDataNascimento] = useState(initial?.dataNascimento ?? "");
+  const [dataNascimento, setDataNascimento] = useState(
+    initial?.dataNascimento ? initial.dataNascimento.slice(0, 10) : ""
+  );
   const [turmaId, setTurmaId] = useState(initial?.turmaId ?? "");
   const [error, setError] = useState<string | null>(null);
 

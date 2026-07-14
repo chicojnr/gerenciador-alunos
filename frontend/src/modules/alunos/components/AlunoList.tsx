@@ -15,6 +15,7 @@ export function AlunoList({ alunos, onEdit, onRemove }: AlunoListProps) {
       columns={[
         { key: "nome", header: "Nome" },
         { key: "turma", header: "Turma", render: (aluno) => aluno.turma.nome },
+        { key: "situacaoAtual", header: "Situação", render: (aluno) => aluno.situacaoAtual.nome },
         {
           key: "acoes",
           header: "Ações",

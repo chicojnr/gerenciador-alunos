@@ -11,6 +11,7 @@ describe("AlunoList", () => {
         nome: "Fulano",
         dataNascimento: null,
         turma: { id: "t1", nome: "Turma A" },
+        situacaoAtual: { id: "s1", nome: "Ativo" },
         ativo: true
       }
     ];

@@ -5,6 +5,7 @@ export interface Aluno {
   nome: string;
   dataNascimento: string | null;
   turma: Option;
+  situacaoAtual: Option;
   ativo: boolean;
 }
 
