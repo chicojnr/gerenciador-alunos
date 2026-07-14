@@ -49,11 +49,12 @@ describe("mensagens routes", () => {
         periodoId: periodo.id
       }
     });
+    const situacaoAtiva = await prisma.situacaoAluno.findUniqueOrThrow({ where: { nome: "Ativo" } });
     const alunoCom = await prisma.aluno.create({
-      data: { nome: "Aluno Com mensagens-test", turmaId: turma.id }
+      data: { nome: "Aluno Com mensagens-test", turmaId: turma.id, situacaoAtualId: situacaoAtiva.id }
     });
     const alunoSem = await prisma.aluno.create({
-      data: { nome: "Aluno Sem mensagens-test", turmaId: turma.id }
+      data: { nome: "Aluno Sem mensagens-test", turmaId: turma.id, situacaoAtualId: situacaoAtiva.id }
     });
     const responsavel = await prisma.responsavel.create({
       data: { nome: "Mae mensagens-test", telefone: "11999998888" }

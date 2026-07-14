@@ -47,8 +47,9 @@ describe("faltas + indicadores routes", () => {
     const turma = await prisma.turma.create({
       data: { nome: "Turma faltas-test", serie: "6 Ano", escolaId: escola.id, periodoId: periodo.id }
     });
+    const situacaoAtiva = await prisma.situacaoAluno.findUniqueOrThrow({ where: { nome: "Ativo" } });
     const aluno = await prisma.aluno.create({
-      data: { nome: "Aluno faltas-test", turmaId: turma.id }
+      data: { nome: "Aluno faltas-test", turmaId: turma.id, situacaoAtualId: situacaoAtiva.id }
     });
     escolaId = escola.id;
     turmaId = turma.id;

@@ -101,18 +101,31 @@ model TurmaMateria {
 }
 
 model Aluno {
-  id             String             @id @default(uuid())
-  nome           String
-  dataNascimento DateTime?
-  turmaId        String
-  turma          Turma              @relation(fields: [turmaId], references: [id])
-  ativo          Boolean            @default(true)
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
-  responsaveis   AlunoResponsavel[]
-  faltas         Falta[]
-  notas          Nota[]
-  envios         EnvioMensagem[]
+  id                 String                   @id @default(uuid())
+  nome               String
+  dataNascimento     DateTime?
+  turmaId            String
+  turma              Turma                    @relation(fields: [turmaId], references: [id])
+  situacaoAtualId    String
+  situacaoAtual      SituacaoAluno            @relation(fields: [situacaoAtualId], references: [id])
+  ativo              Boolean                  @default(true)
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+  responsaveis       AlunoResponsavel[]
+  faltas             Falta[]
+  notas              Nota[]
+  envios             EnvioMensagem[]
+  situacoesHistorico AlunoSituacaoHistorico[]
+}
+
+model SituacaoAluno {
+  id        String                   @id @default(uuid())
+  nome      String                   @unique
+  ativo     Boolean                  @default(true)
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+  alunos    Aluno[]
+  historico AlunoSituacaoHistorico[]
 }
 
 model Responsavel {
@@ -251,4 +264,15 @@ model EnvioMensagem {
   mensagem      String
   status        String           @default("REGISTRADO")
   createdAt     DateTime         @default(now())
+}
+
+model AlunoSituacaoHistorico {
+  id          String        @id @default(uuid())
+  alunoId     String
+  aluno       Aluno         @relation(fields: [alunoId], references: [id])
+  situacaoId  String
+  situacao    SituacaoAluno @relation(fields: [situacaoId], references: [id])
+  dataMudanca DateTime      @db.Date
+  observacao  String?
+  createdAt   DateTime      @default(now())
 }

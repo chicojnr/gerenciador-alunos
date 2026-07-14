@@ -46,8 +46,9 @@ describe("aluno-responsaveis routes", () => {
         periodoId: periodo.id
       }
     });
+    const situacaoAtiva = await prisma.situacaoAluno.findUniqueOrThrow({ where: { nome: "Ativo" } });
     const aluno = await prisma.aluno.create({
-      data: { nome: "Aluno aluno-resp-test", turmaId: turma.id }
+      data: { nome: "Aluno aluno-resp-test", turmaId: turma.id, situacaoAtualId: situacaoAtiva.id }
     });
     const responsavel = await prisma.responsavel.create({
       data: { nome: "Responsavel aluno-resp-test" }

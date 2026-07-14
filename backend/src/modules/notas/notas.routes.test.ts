@@ -43,7 +43,10 @@ describe("notas routes", () => {
     const turma = await prisma.turma.create({
       data: { nome: "Turma notas-test", serie: "6 Ano", escolaId: escola.id, periodoId: periodo.id }
     });
-    const aluno = await prisma.aluno.create({ data: { nome: "Aluno notas-test", turmaId: turma.id } });
+    const situacaoAtiva = await prisma.situacaoAluno.findUniqueOrThrow({ where: { nome: "Ativo" } });
+    const aluno = await prisma.aluno.create({
+      data: { nome: "Aluno notas-test", turmaId: turma.id, situacaoAtualId: situacaoAtiva.id }
+    });
 
     turmaId = turma.id;
     materiaId = materia.id;
