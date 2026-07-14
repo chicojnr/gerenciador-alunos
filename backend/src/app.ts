@@ -14,6 +14,7 @@ import { registerAlunosRoutes } from "./modules/alunos/alunos.routes.js";
 import { registerSituacoesAlunoRoutes } from "./modules/situacoes-aluno/situacoes-aluno.routes.js";
 import { registerResponsaveisRoutes } from "./modules/responsaveis/responsaveis.routes.js";
 import { registerAlunoResponsaveisRoutes } from "./modules/aluno-responsaveis/aluno-responsaveis.routes.js";
+import { registerAlunoSituacoesRoutes } from "./modules/aluno-situacoes/aluno-situacoes.routes.js";
 import { registerCalendariosLetivosRoutes } from "./modules/calendarios-letivos/calendarios-letivos.routes.js";
 import { registerResponsaveisComunicacaoRoutes } from "./modules/responsaveis-comunicacao/responsaveis-comunicacao.routes.js";
 import { registerFaltasRoutes } from "./modules/faltas/faltas.routes.js";
@@ -44,6 +45,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerSituacoesAlunoRoutes(app, config);
   registerResponsaveisRoutes(app, config);
   registerAlunoResponsaveisRoutes(app, config);
+  registerAlunoSituacoesRoutes(app, config);
   registerCalendariosLetivosRoutes(app, config);
   registerResponsaveisComunicacaoRoutes(app, config);
   registerFaltasRoutes(app, config);
