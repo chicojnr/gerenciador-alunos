@@ -11,6 +11,7 @@ import { registerProfessoresRoutes } from "./modules/professores/professores.rou
 import { registerTurmasRoutes } from "./modules/turmas/turmas.routes.js";
 import { registerTurmaMateriasRoutes } from "./modules/turma-materias/turma-materias.routes.js";
 import { registerAlunosRoutes } from "./modules/alunos/alunos.routes.js";
+import { registerSituacoesAlunoRoutes } from "./modules/situacoes-aluno/situacoes-aluno.routes.js";
 import { registerResponsaveisRoutes } from "./modules/responsaveis/responsaveis.routes.js";
 import { registerAlunoResponsaveisRoutes } from "./modules/aluno-responsaveis/aluno-responsaveis.routes.js";
 import { registerCalendariosLetivosRoutes } from "./modules/calendarios-letivos/calendarios-letivos.routes.js";
@@ -40,6 +41,7 @@ export async function buildApp(): Promise<FastifyInstance> {
   registerTurmasRoutes(app, config);
   registerTurmaMateriasRoutes(app, config);
   registerAlunosRoutes(app, config);
+  registerSituacoesAlunoRoutes(app, config);
   registerResponsaveisRoutes(app, config);
   registerAlunoResponsaveisRoutes(app, config);
   registerCalendariosLetivosRoutes(app, config);
