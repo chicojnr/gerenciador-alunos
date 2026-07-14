@@ -28,6 +28,7 @@ describe("alunos routes", () => {
   });
 
   beforeEach(async () => {
+    await prisma.alunoSituacaoHistorico.deleteMany();
     await prisma.aluno.deleteMany();
     await prisma.turma.deleteMany({ where: { nome: { contains: "alunos-routes-test" } } });
     await prisma.escola.deleteMany({ where: { nome: { contains: "alunos-routes-test" } } });
@@ -46,6 +47,7 @@ describe("alunos routes", () => {
   });
 
   afterAll(async () => {
+    await prisma.alunoSituacaoHistorico.deleteMany();
     await prisma.aluno.deleteMany();
     await prisma.turma.deleteMany({ where: { nome: { contains: "alunos-routes-test" } } });
     await prisma.escola.deleteMany({ where: { nome: { contains: "alunos-routes-test" } } });
@@ -68,6 +70,7 @@ describe("alunos routes", () => {
     });
     expect(createRes.statusCode).toBe(201);
     expect(createRes.json().turma.id).toBe(turmaId);
+    expect(createRes.json().situacaoAtual.nome).toBe("Ativo");
 
     const listRes = await app.inject({
       method: "GET",

@@ -6,6 +6,7 @@ describe("alunoService", () => {
   let turmaId: string;
 
   beforeEach(async () => {
+    await prisma.alunoSituacaoHistorico.deleteMany();
     await prisma.aluno.deleteMany();
     await prisma.turma.deleteMany({ where: { nome: { contains: "alunos-test" } } });
     await prisma.escola.deleteMany({ where: { nome: { contains: "alunos-test" } } });
@@ -19,6 +20,7 @@ describe("alunoService", () => {
   });
 
   afterAll(async () => {
+    await prisma.alunoSituacaoHistorico.deleteMany();
     await prisma.aluno.deleteMany();
     await prisma.turma.deleteMany({ where: { nome: { contains: "alunos-test" } } });
     await prisma.escola.deleteMany({ where: { nome: { contains: "alunos-test" } } });
@@ -31,6 +33,11 @@ describe("alunoService", () => {
     const found = await alunoService.getById(created.id);
     expect(found.nome).toBe("Fulano");
     expect(found.turma.id).toBe(turmaId);
+  });
+
+  it("assigns the default situacao 'Ativo' on creation", async () => {
+    const created = await alunoService.create({ nome: "Beltrano", turmaId });
+    expect(created.situacaoAtual.nome).toBe("Ativo");
   });
 
   it("throws AlunoNotFoundError for missing id", async () => {

@@ -1,4 +1,5 @@
 import { alunoRepository } from "./alunos.repository.js";
+import { situacaoAlunoRepository } from "../situacoes-aluno/situacoes-aluno.repository.js";
 import type { CreateAlunoInput, UpdateAlunoInput } from "./alunos.types.js";
 
 export class AlunoNotFoundError extends Error {}
@@ -28,7 +29,11 @@ export const alunoService = {
 
   async create(data: CreateAlunoInput) {
     assertValid(data);
-    return alunoRepository.create(data);
+    const situacaoAtiva = await situacaoAlunoRepository.findByNome("Ativo");
+    if (!situacaoAtiva) {
+      throw new AlunoValidationError("situação padrão 'Ativo' não está cadastrada");
+    }
+    return alunoRepository.create({ ...data, situacaoAtualId: situacaoAtiva.id });
   },
 
   async update(id: string, data: UpdateAlunoInput) {

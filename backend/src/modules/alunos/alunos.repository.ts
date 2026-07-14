@@ -2,15 +2,9 @@ import { prisma } from "../../core/prisma.js";
 import type { CreateAlunoInput, UpdateAlunoInput } from "./alunos.types.js";
 
 const INCLUDE = {
-  turma: { select: { id: true, nome: true } }
+  turma: { select: { id: true, nome: true } },
+  situacaoAtual: { select: { id: true, nome: true } }
 } as const;
-
-function toCreateData(data: CreateAlunoInput) {
-  return {
-    ...data,
-    dataNascimento: data.dataNascimento ? new Date(data.dataNascimento) : undefined
-  };
-}
 
 function toUpdateData(data: UpdateAlunoInput) {
   return {
@@ -39,8 +33,22 @@ export const alunoRepository = {
     return prisma.aluno.findUnique({ where: { id }, include: INCLUDE });
   },
 
-  create(data: CreateAlunoInput) {
-    return prisma.aluno.create({ data: toCreateData(data), include: INCLUDE });
+  create(data: CreateAlunoInput & { situacaoAtualId: string }) {
+    const { situacaoAtualId, ...alunoData } = data;
+    return prisma.$transaction(async (tx) => {
+      const aluno = await tx.aluno.create({
+        data: {
+          ...alunoData,
+          dataNascimento: alunoData.dataNascimento ? new Date(alunoData.dataNascimento) : undefined,
+          situacaoAtualId
+        },
+        include: INCLUDE
+      });
+      await tx.alunoSituacaoHistorico.create({
+        data: { alunoId: aluno.id, situacaoId: situacaoAtualId, dataMudanca: aluno.createdAt }
+      });
+      return aluno;
+    });
   },
 
   update(id: string, data: UpdateAlunoInput) {
