@@ -22,6 +22,7 @@ import {
   Repeat2
 } from "lucide-react";
 import { useAuth } from "../auth/AuthContext.js";
+import { AuthExpiredModal } from "../auth/AuthExpiredModal.js";
 
 const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, adminOnly: false },
@@ -30,7 +31,7 @@ const NAV_ITEMS = [
   { to: "/desempenho", label: "Desempenho", icon: LineChart, adminOnly: false },
   { to: "/escolas", label: "Escolas", icon: Building2, adminOnly: true },
   { to: "/periodos", label: "Períodos", icon: Clock, adminOnly: false },
-  { to: "/materias", label: "Matérias", icon: BookOpen, adminOnly: false },
+  { to: "/materias", label: "Disciplinas", icon: BookOpen, adminOnly: false },
   { to: "/professores", label: "Professores", icon: UserRound, adminOnly: false },
   { to: "/turmas", label: "Turmas", icon: Layers, adminOnly: false },
   { to: "/alunos", label: "Alunos", icon: StudentIcon, adminOnly: false },
@@ -64,6 +65,7 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen bg-zinc-50">
+      <AuthExpiredModal />
       <aside className="flex w-64 flex-col bg-zinc-900">
         <div className="flex items-center gap-2.5 px-5 py-5">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-lg shadow-indigo-950/40">
