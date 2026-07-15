@@ -28,8 +28,22 @@ export const responsavelComunicacaoRepository = {
     return prisma.responsavelComunicacao.findUnique({ where: { id }, include: INCLUDE });
   },
 
+  findByUserAndEscola(userId: string, escolaId: string) {
+    return prisma.responsavelComunicacao.findUnique({
+      where: { userId_escolaId: { userId, escolaId } }
+    });
+  },
+
   create(data: CreateResponsavelComunicacaoInput) {
     return prisma.responsavelComunicacao.create({ data, include: INCLUDE });
+  },
+
+  reactivate(id: string, data: CreateResponsavelComunicacaoInput) {
+    return prisma.responsavelComunicacao.update({
+      where: { id },
+      data: { ...data, ativo: true },
+      include: INCLUDE
+    });
   },
 
   update(id: string, data: UpdateResponsavelComunicacaoInput) {
@@ -38,5 +52,9 @@ export const responsavelComunicacaoRepository = {
 
   softDelete(id: string) {
     return prisma.responsavelComunicacao.update({ where: { id }, data: { ativo: false } });
+  },
+
+  hardDelete(id: string) {
+    return prisma.responsavelComunicacao.delete({ where: { id } });
   }
 };

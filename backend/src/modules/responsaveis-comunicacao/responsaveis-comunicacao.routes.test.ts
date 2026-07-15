@@ -118,4 +118,82 @@ describe("responsaveis-comunicacao routes", () => {
     });
     expect(deleteRes.statusCode).toBe(200);
   });
+
+  it("allows re-adding a user after soft-delete", async () => {
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: coordenadorUserId, escolaId }
+    });
+    const { id } = createRes.json();
+
+    await app.inject({
+      method: "DELETE",
+      url: `/responsaveis-comunicacao/${id}`,
+      headers: { cookie: authCookie }
+    });
+
+    const listAfterDelete = await app.inject({
+      method: "GET",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie }
+    });
+    expect(listAfterDelete.json().items).toHaveLength(0);
+
+    const recreateRes = await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: coordenadorUserId, escolaId }
+    });
+    expect(recreateRes.statusCode).toBe(201);
+
+    const listRes = await app.inject({
+      method: "GET",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie }
+    });
+    expect(listRes.json().items).toHaveLength(1);
+  });
+
+  it("allows updating into a combo previously soft-deleted", async () => {
+    const outroUser = await prisma.user.create({
+      data: {
+        email: "outro@resp-com-test.com",
+        passwordHash: await hashPassword("x"),
+        name: "Outro Teste"
+      }
+    });
+
+    const staleRes = await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: outroUser.id, escolaId }
+    });
+    const staleId = staleRes.json().id;
+    await app.inject({
+      method: "DELETE",
+      url: `/responsaveis-comunicacao/${staleId}`,
+      headers: { cookie: authCookie }
+    });
+
+    const createRes = await app.inject({
+      method: "POST",
+      url: "/responsaveis-comunicacao",
+      headers: { cookie: authCookie },
+      payload: { userId: coordenadorUserId, escolaId }
+    });
+    const { id } = createRes.json();
+
+    const updateRes = await app.inject({
+      method: "PUT",
+      url: `/responsaveis-comunicacao/${id}`,
+      headers: { cookie: authCookie },
+      payload: { userId: outroUser.id, escolaId }
+    });
+    expect(updateRes.statusCode).toBe(200);
+    expect(updateRes.json().user.id).toBe(outroUser.id);
+  });
 });

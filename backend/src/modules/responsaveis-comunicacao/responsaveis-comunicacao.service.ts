@@ -47,6 +47,18 @@ export const responsavelComunicacaoService = {
       throw new ResponsavelComunicacaoValidationError("usuário e escola são obrigatórios");
     }
     await assertUserExists(data.userId);
+    const existing = await responsavelComunicacaoRepository.findByUserAndEscola(
+      data.userId,
+      data.escolaId
+    );
+    if (existing) {
+      if (existing.ativo) {
+        throw new ResponsavelComunicacaoDuplicateError(
+          "este usuário já é responsável por comunicação nesta escola"
+        );
+      }
+      return responsavelComunicacaoRepository.reactivate(existing.id, data);
+    }
     try {
       return await responsavelComunicacaoRepository.create(data);
     } catch (err) {
@@ -61,9 +73,25 @@ export const responsavelComunicacaoService = {
 
   async update(id: string, data: UpdateResponsavelComunicacaoInput) {
     assertValid(data);
-    await this.getById(id);
+    const current = await this.getById(id);
     if (data.userId !== undefined) {
       await assertUserExists(data.userId);
+    }
+    const targetUserId = data.userId ?? current.userId;
+    const targetEscolaId = data.escolaId ?? current.escolaId;
+    if (targetUserId !== current.userId || targetEscolaId !== current.escolaId) {
+      const clash = await responsavelComunicacaoRepository.findByUserAndEscola(
+        targetUserId,
+        targetEscolaId
+      );
+      if (clash && clash.id !== id) {
+        if (clash.ativo) {
+          throw new ResponsavelComunicacaoDuplicateError(
+            "este usuário já é responsável por comunicação nesta escola"
+          );
+        }
+        await responsavelComunicacaoRepository.hardDelete(clash.id);
+      }
     }
     try {
       return await responsavelComunicacaoRepository.update(id, data);
