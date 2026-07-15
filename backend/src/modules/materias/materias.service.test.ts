@@ -12,9 +12,10 @@ describe("materiaService", () => {
   });
 
   it("creates and retrieves a materia", async () => {
-    const created = await materiaService.create({ nome: "Matemática" });
+    const created = await materiaService.create({ nome: "Matemática", codigo: "MAT1" });
     const found = await materiaService.getById(created.id);
     expect(found.nome).toBe("Matemática");
+    expect(found.codigo).toBe("MAT1");
     expect(found.ativo).toBe(true);
   });
 
@@ -25,8 +26,8 @@ describe("materiaService", () => {
   });
 
   it("lists only active materias after soft delete", async () => {
-    const a = await materiaService.create({ nome: "Matemática" });
-    await materiaService.create({ nome: "Português" });
+    const a = await materiaService.create({ nome: "Matemática", codigo: "MAT1" });
+    await materiaService.create({ nome: "Português", codigo: "POR1" });
     await materiaService.remove(a.id);
 
     const { items, total } = await materiaService.list(1, 10);
@@ -35,11 +36,35 @@ describe("materiaService", () => {
   });
 
   it("rejects creating a materia with an empty nome", async () => {
-    await expect(materiaService.create({ nome: "" })).rejects.toThrow();
+    await expect(materiaService.create({ nome: "", codigo: "MAT1" })).rejects.toThrow();
   });
 
-  it("rejects creating a materia with a duplicate nome", async () => {
-    await materiaService.create({ nome: "Matemática" });
-    await expect(materiaService.create({ nome: "Matemática" })).rejects.toThrow();
+  it("rejects creating a materia without codigo", async () => {
+    await expect(materiaService.create({ nome: "Matemática", codigo: "" })).rejects.toThrow();
+  });
+
+  it("rejects creating a materia with a duplicate codigo", async () => {
+    await materiaService.create({ nome: "Matemática 1ª série", codigo: "MAT1" });
+    await expect(
+      materiaService.create({ nome: "Matemática 2ª série", codigo: "MAT1" })
+    ).rejects.toThrow();
+  });
+
+  it("allows repeated nome as long as codigo differs", async () => {
+    await materiaService.create({ nome: "Matemática", codigo: "MAT1" });
+    await expect(
+      materiaService.create({ nome: "Matemática", codigo: "MAT4" })
+    ).resolves.toBeDefined();
+  });
+
+  it("reactivates a soft-deleted materia instead of failing on duplicate codigo", async () => {
+    const created = await materiaService.create({ nome: "Arte", codigo: "ART1" });
+    await materiaService.remove(created.id);
+
+    const recreated = await materiaService.create({ nome: "Arte Renomeada", codigo: "ART1" });
+
+    expect(recreated.id).toBe(created.id);
+    expect(recreated.nome).toBe("Arte Renomeada");
+    expect(recreated.ativo).toBe(true);
   });
 });

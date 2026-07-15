@@ -112,7 +112,7 @@ export function DesempenhoPage() {
           disabled={loadingMaterias}
           className={SELECT_CLASSES}
         >
-          <option value="">Selecione uma matéria</option>
+          <option value="">Selecione uma disciplina</option>
           {materias.map((m) => (
             <option key={m.id} value={m.id}>
               {m.nome}
@@ -133,7 +133,7 @@ export function DesempenhoPage() {
       </div>
 
       {!turmaId || !materiaId ? (
-        <p className="text-sm text-zinc-400">Selecione turma e matéria para lançar notas.</p>
+        <p className="text-sm text-zinc-400">Selecione turma e disciplina para lançar notas.</p>
       ) : loadingDados ? (
         <p className="text-sm text-zinc-400">Carregando...</p>
       ) : loadError ? (

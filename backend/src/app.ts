@@ -1,6 +1,7 @@
 import Fastify, { FastifyInstance } from "fastify";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
+import multipart from "@fastify/multipart";
 import { loadConfig } from "./core/config.js";
 import { registerAuthRoutes } from "./auth/auth.routes.js";
 import { registerEscolasRoutes } from "./modules/escolas/escolas.routes.js";
@@ -30,6 +31,7 @@ export async function buildApp(): Promise<FastifyInstance> {
 
   await app.register(cors, { origin: true, credentials: true });
   await app.register(cookie);
+  await app.register(multipart, { limits: { fileSize: 10 * 1024 * 1024 } });
 
   app.get("/health", async () => ({ status: "ok" }));
 

@@ -1,5 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { materiaService, MateriaNotFoundError, MateriaValidationError } from "./materias.service.js";
+import { materiaImportService } from "./materias-import.service.js";
+import { MateriaImportParseError } from "./materias-import.parser.js";
 import { requireAuth } from "../../core/auth-hook.js";
 import type { Config } from "../../core/config.js";
 import type { CreateMateriaInput, UpdateMateriaInput } from "./materias.types.js";
@@ -22,7 +24,7 @@ export function registerMateriasRoutes(app: FastifyInstance, config: Config) {
       return await materiaService.getById(request.params.id);
     } catch (err) {
       if (err instanceof MateriaNotFoundError) {
-        return reply.code(404).send({ error: "Matéria não encontrada" });
+        return reply.code(404).send({ error: "Disciplina não encontrada" });
       }
       throw err;
     }
@@ -48,7 +50,7 @@ export function registerMateriasRoutes(app: FastifyInstance, config: Config) {
         return await materiaService.update(request.params.id, request.body);
       } catch (err) {
         if (err instanceof MateriaNotFoundError) {
-          return reply.code(404).send({ error: "Matéria não encontrada" });
+          return reply.code(404).send({ error: "Disciplina não encontrada" });
         }
         if (err instanceof MateriaValidationError) {
           return reply.code(400).send({ error: err.message });
@@ -58,12 +60,41 @@ export function registerMateriasRoutes(app: FastifyInstance, config: Config) {
     }
   );
 
+  app.post("/materias/import/parse", auth, async (request, reply) => {
+    const file = await request.file();
+    if (!file) {
+      return reply.code(400).send({ error: "arquivo PDF é obrigatório" });
+    }
+    const buffer = await file.toBuffer();
+    try {
+      const items = await materiaImportService.preview(buffer);
+      return { items };
+    } catch (err) {
+      if (err instanceof MateriaImportParseError) {
+        return reply.code(422).send({ error: err.message });
+      }
+      throw err;
+    }
+  });
+
+  app.post<{ Body: { items: { nome: string; codigo: string }[] } }>(
+    "/materias/import/confirm",
+    auth,
+    async (request, reply) => {
+      const items = request.body?.items;
+      if (!Array.isArray(items) || items.length === 0) {
+        return reply.code(400).send({ error: "nenhum item selecionado" });
+      }
+      return materiaImportService.confirm(items);
+    }
+  );
+
   app.delete<{ Params: { id: string } }>("/materias/:id", auth, async (request, reply) => {
     try {
       return await materiaService.remove(request.params.id);
     } catch (err) {
       if (err instanceof MateriaNotFoundError) {
-        return reply.code(404).send({ error: "Matéria não encontrada" });
+        return reply.code(404).send({ error: "Disciplina não encontrada" });
       }
       throw err;
     }

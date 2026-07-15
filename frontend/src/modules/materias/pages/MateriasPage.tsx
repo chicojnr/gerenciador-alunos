@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { BookOpen, Plus } from "lucide-react";
+import { BookOpen, Plus, Upload } from "lucide-react";
 import { useMaterias } from "../hooks/useMaterias.js";
 import { MateriaForm } from "../components/MateriaForm.js";
 import { MateriaList } from "../components/MateriaList.js";
+import { MateriaImportModal } from "../components/MateriaImportModal.js";
 import { Modal } from "../../../shared/components/Modal.js";
 import { Button } from "../../../shared/components/Button.js";
 import { useConfirm } from "../../../shared/contexts/ConfirmContext.js";
 import type { Materia, CreateMateriaInput } from "../types.js";
 
 export function MateriasPage() {
-  const { materias, loading, create, update, remove } = useMaterias();
+  const { materias, loading, create, update, remove, refresh } = useMaterias();
   const confirm = useConfirm();
   const [modalOpen, setModalOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState<Materia | null>(null);
 
   if (loading) {
@@ -32,7 +34,7 @@ export function MateriasPage() {
     if (editing) {
       const ok = await confirm({
         title: "Salvar alterações",
-        message: "Confirma a alteração desta matéria?",
+        message: "Confirma a alteração desta disciplina?",
         confirmLabel: "Salvar"
       });
       if (!ok) {
@@ -47,8 +49,8 @@ export function MateriasPage() {
 
   async function handleRemove(id: string) {
     const ok = await confirm({
-      title: "Remover matéria",
-      message: "Tem certeza que deseja remover esta matéria?",
+      title: "Remover disciplina",
+      message: "Tem certeza que deseja remover esta disciplina?",
       confirmLabel: "Remover",
       variant: "danger"
     });
@@ -62,21 +64,33 @@ export function MateriasPage() {
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <BookOpen className="h-5 w-5 text-zinc-400" strokeWidth={2} />
-          <h1 className="text-xl font-semibold text-zinc-900">Matérias</h1>
+          <h1 className="text-xl font-semibold text-zinc-900">Disciplinas</h1>
         </div>
-        <Button onClick={openCreate}>
-          <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
-          Nova Matéria
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" onClick={() => setImportOpen(true)}>
+            <Upload className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+            Importar
+          </Button>
+          <Button onClick={openCreate}>
+            <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+            Nova Disciplina
+          </Button>
+        </div>
       </div>
       <MateriaList materias={materias} onEdit={openEdit} onRemove={handleRemove} />
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <MateriaForm
-          initial={editing ? { nome: editing.nome } : undefined}
+          initial={editing ? { nome: editing.nome, codigo: editing.codigo ?? "" } : undefined}
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
+      <MateriaImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImported={refresh}
+      />
     </div>
   );
 }

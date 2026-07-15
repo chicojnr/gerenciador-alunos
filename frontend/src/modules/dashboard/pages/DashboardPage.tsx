@@ -69,7 +69,7 @@ export function DashboardPage() {
               />
             </div>
             <div className="rounded-lg border border-zinc-200 bg-white p-4">
-              <h2 className="mb-4 text-sm font-medium text-zinc-700">Média de notas por matéria</h2>
+              <h2 className="mb-4 text-sm font-medium text-zinc-700">Média de notas por disciplina</h2>
               <BarList
                 items={resumo.mediaNotasPorMateria.map((m) => ({
                   id: m.materiaId,

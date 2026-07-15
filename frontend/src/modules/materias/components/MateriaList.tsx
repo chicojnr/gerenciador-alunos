@@ -1,6 +1,7 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Table } from "../../../shared/components/Table.js";
 import { Button } from "../../../shared/components/Button.js";
+import { ClickableCell } from "../../../shared/components/ClickableCell.js";
 import type { Materia } from "../types.js";
 
 interface MateriaListProps {
@@ -13,18 +14,25 @@ export function MateriaList({ materias, onEdit, onRemove }: MateriaListProps) {
   return (
     <Table<Materia>
       columns={[
-        { key: "nome", header: "Nome" },
+        {
+          key: "codigo",
+          header: "Código",
+          render: (materia) => (
+            <ClickableCell text={materia.codigo ?? ""} onClick={() => onEdit(materia)} />
+          )
+        },
+        {
+          key: "nome",
+          header: "Disciplina",
+          render: (materia) => <ClickableCell text={materia.nome} onClick={() => onEdit(materia)} />
+        },
         {
           key: "acoes",
           header: "Ações",
           render: (materia) => (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => onEdit(materia)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => onRemove(materia.id)}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            <div className="flex justify-end gap-2">
+              <Button variant="danger" size="sm" onClick={() => onRemove(materia.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
                 Remover
               </Button>
             </div>

@@ -51,7 +51,8 @@ model Periodo {
 
 model Materia {
   id            String         @id @default(uuid())
-  nome          String         @unique
+  nome          String
+  codigo        String?        @unique
   ativo         Boolean        @default(true)
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt

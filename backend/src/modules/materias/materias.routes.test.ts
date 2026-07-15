@@ -44,7 +44,7 @@ describe("materias routes", () => {
       method: "POST",
       url: "/materias",
       headers: { cookie: authCookie },
-      payload: { nome: "Matemática" }
+      payload: { nome: "Matemática", codigo: "MAT1" }
     });
     expect(createRes.statusCode).toBe(201);
 
@@ -57,6 +57,7 @@ describe("materias routes", () => {
     const body = listRes.json();
     expect(body.items).toHaveLength(1);
     expect(body.items[0].nome).toBe("Matemática");
+    expect(body.items[0].codigo).toBe("MAT1");
   });
 
   it("soft-deletes a materia", async () => {
@@ -64,7 +65,7 @@ describe("materias routes", () => {
       method: "POST",
       url: "/materias",
       headers: { cookie: authCookie },
-      payload: { nome: "Para Remover" }
+      payload: { nome: "Para Remover", codigo: "REM1" }
     });
     const { id } = createRes.json();
 
@@ -81,5 +82,35 @@ describe("materias routes", () => {
       headers: { cookie: authCookie }
     });
     expect(listRes.json().items).toHaveLength(0);
+  });
+
+  it("confirms import creating valid items and reporting errors for invalid ones", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/materias/import/confirm",
+      headers: { cookie: authCookie },
+      payload: {
+        items: [
+          { nome: "Arte", codigo: "ART1" },
+          { nome: "Sem código", codigo: "" }
+        ]
+      }
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.created).toHaveLength(1);
+    expect(body.created[0].codigo).toBe("ART1");
+    expect(body.errors).toHaveLength(1);
+  });
+
+  it("rejects import confirm with no items", async () => {
+    const response = await app.inject({
+      method: "POST",
+      url: "/materias/import/confirm",
+      headers: { cookie: authCookie },
+      payload: { items: [] }
+    });
+    expect(response.statusCode).toBe(400);
   });
 });

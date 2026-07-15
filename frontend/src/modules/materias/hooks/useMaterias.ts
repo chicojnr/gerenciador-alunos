@@ -32,5 +32,5 @@ export function useMaterias() {
     await refresh();
   }
 
-  return { materias, loading, create, update, remove };
+  return { materias, loading, create, update, remove, refresh };
 }

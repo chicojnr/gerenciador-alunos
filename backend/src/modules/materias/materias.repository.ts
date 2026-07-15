@@ -19,6 +19,18 @@ export const materiaRepository = {
     return prisma.materia.findUnique({ where: { id } });
   },
 
+  findByCodigos(codigos: string[]) {
+    return prisma.materia.findMany({ where: { codigo: { in: codigos } } });
+  },
+
+  findByCodigo(codigo: string) {
+    return prisma.materia.findUnique({ where: { codigo } });
+  },
+
+  reactivate(id: string, data: CreateMateriaInput) {
+    return prisma.materia.update({ where: { id }, data: { ...data, ativo: true } });
+  },
+
   create(data: CreateMateriaInput) {
     return prisma.materia.create({ data });
   },

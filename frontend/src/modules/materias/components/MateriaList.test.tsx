@@ -5,7 +5,7 @@ import type { Materia } from "../types.js";
 
 describe("MateriaList", () => {
   it("renders materias and calls onEdit/onRemove when clicked", () => {
-    const materias: Materia[] = [{ id: "1", nome: "Matemática", ativo: true }];
+    const materias: Materia[] = [{ id: "1", nome: "Matemática", codigo: "MAT1", ativo: true }];
     const onEdit = vi.fn();
     const onRemove = vi.fn();
 
@@ -13,7 +13,7 @@ describe("MateriaList", () => {
 
     expect(screen.getByText("Matemática")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Matemática"));
     expect(onEdit).toHaveBeenCalledWith(materias[0]);
 
     fireEvent.click(screen.getByText("Remover"));

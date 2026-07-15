@@ -33,7 +33,7 @@ export function TurmaMateriaPanel({ turmaId }: TurmaMateriaPanelProps) {
       setMateriaId("");
       setProfessorId("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Não foi possível atribuir a matéria.");
+      setError(err instanceof Error ? err.message : "Não foi possível atribuir a disciplina.");
     }
   }
 
@@ -58,7 +58,7 @@ export function TurmaMateriaPanel({ turmaId }: TurmaMateriaPanelProps) {
       {loading ? (
         <p className="text-sm text-zinc-400">Carregando...</p>
       ) : turmaMaterias.length === 0 ? (
-        <p className="text-sm text-zinc-400">Nenhuma matéria atribuída ainda.</p>
+        <p className="text-sm text-zinc-400">Nenhuma disciplina atribuída ainda.</p>
       ) : (
         <ul className="mb-3 space-y-1.5">
           {turmaMaterias.map((tm) => (
@@ -88,7 +88,7 @@ export function TurmaMateriaPanel({ turmaId }: TurmaMateriaPanelProps) {
           onChange={(e) => setMateriaId(e.target.value)}
           className={SELECT_CLASSES}
         >
-          <option value="">Matéria</option>
+          <option value="">Disciplina</option>
           {materias.map((m) => (
             <option key={m.id} value={m.id}>
               {m.nome}
