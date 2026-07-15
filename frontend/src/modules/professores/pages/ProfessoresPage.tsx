@@ -84,6 +84,7 @@ export function ProfessoresPage() {
           }
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
     </div>

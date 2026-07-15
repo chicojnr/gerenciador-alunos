@@ -23,7 +23,7 @@ describe("ResponsavelComunicacaoList", () => {
     expect(screen.getByText("Coordenador")).toBeTruthy();
     expect(screen.getByText("coordenador@example.com")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Coordenador"));
     expect(onEdit).toHaveBeenCalledWith(items[0]);
 
     fireEvent.click(screen.getByText("Remover"));

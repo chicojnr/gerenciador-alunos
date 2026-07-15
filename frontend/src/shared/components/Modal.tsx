@@ -1,12 +1,20 @@
 import { ReactNode } from "react";
 
+type ModalSize = "md" | "lg";
+
+const SIZE_CLASSES: Record<ModalSize, string> = {
+  md: "max-w-md",
+  lg: "max-w-3xl"
+};
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
+  size?: ModalSize;
 }
 
-export function Modal({ open, onClose, children }: ModalProps) {
+export function Modal({ open, onClose, children, size = "md" }: ModalProps) {
   if (!open) {
     return null;
   }
@@ -16,17 +24,8 @@ export function Modal({ open, onClose, children }: ModalProps) {
       <div
         role="dialog"
         aria-modal="true"
-        className="w-full max-w-md animate-modal-in rounded-lg bg-white p-6 shadow-xl"
+        className={`w-full ${SIZE_CLASSES[size]} animate-modal-in rounded-lg bg-white p-6 shadow-xl`}
       >
-        <div className="mb-2 flex justify-end">
-          <button
-            aria-label="Fechar"
-            onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600"
-          >
-            ×
-          </button>
-        </div>
         {children}
       </div>
     </div>

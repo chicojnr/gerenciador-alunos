@@ -7,12 +7,18 @@ interface CalendarioLetivoFormProps {
   initial?: CreateCalendarioLetivoInput;
   submitLabel: string;
   onSubmit: (data: CreateCalendarioLetivoInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
   "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
-export function CalendarioLetivoForm({ initial, submitLabel, onSubmit }: CalendarioLetivoFormProps) {
+export function CalendarioLetivoForm({
+  initial,
+  submitLabel,
+  onSubmit,
+  onCancel
+}: CalendarioLetivoFormProps) {
   const { escolas, loading: loadingEscolas } = useEscolaOptions();
   const [nome, setNome] = useState(initial?.nome ?? "");
   const [dataInicio, setDataInicio] = useState(initial?.dataInicio?.slice(0, 10) ?? "");
@@ -71,7 +77,12 @@ export function CalendarioLetivoForm({ initial, submitLabel, onSubmit }: Calenda
           </option>
         ))}
       </select>
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

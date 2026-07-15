@@ -85,6 +85,7 @@ export function AlunosPage() {
           }
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
         {editing && <AlunoResponsavelPanel alunoId={editing.id} />}
         {editing && <AlunoSituacaoPanel alunoId={editing.id} onChanged={refresh} />}

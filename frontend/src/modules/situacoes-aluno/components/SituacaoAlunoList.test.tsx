@@ -13,7 +13,7 @@ describe("SituacaoAlunoList", () => {
 
     expect(screen.getByText("Ativo")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Ativo"));
     expect(onEdit).toHaveBeenCalledWith(situacoes[0]);
 
     fireEvent.click(screen.getByText("Remover"));

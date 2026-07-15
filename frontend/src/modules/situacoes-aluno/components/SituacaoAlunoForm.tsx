@@ -6,9 +6,15 @@ interface SituacaoAlunoFormProps {
   initial?: CreateSituacaoAlunoInput;
   submitLabel: string;
   onSubmit: (data: CreateSituacaoAlunoInput) => Promise<void>;
+  onCancel: () => void;
 }
 
-export function SituacaoAlunoForm({ initial, submitLabel, onSubmit }: SituacaoAlunoFormProps) {
+export function SituacaoAlunoForm({
+  initial,
+  submitLabel,
+  onSubmit,
+  onCancel
+}: SituacaoAlunoFormProps) {
   const [nome, setNome] = useState(initial?.nome ?? "");
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +39,12 @@ export function SituacaoAlunoForm({ initial, submitLabel, onSubmit }: SituacaoAl
         placeholder="Nome da situação"
         className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600"
       />
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

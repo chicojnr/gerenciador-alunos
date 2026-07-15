@@ -84,6 +84,7 @@ export function CalendariosLetivosPage() {
           }
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
     </div>

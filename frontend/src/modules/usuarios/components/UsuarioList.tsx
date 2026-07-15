@@ -1,6 +1,7 @@
-import { Pencil, Trash2, ShieldCheck } from "lucide-react";
+import { Trash2, ShieldCheck } from "lucide-react";
 import { Table } from "../../../shared/components/Table.js";
 import { Button } from "../../../shared/components/Button.js";
+import { ClickableCell } from "../../../shared/components/ClickableCell.js";
 import type { Usuario } from "../types.js";
 
 interface UsuarioListProps {
@@ -13,7 +14,11 @@ export function UsuarioList({ usuarios, onEdit, onRemove }: UsuarioListProps) {
   return (
     <Table<Usuario>
       columns={[
-        { key: "name", header: "Nome" },
+        {
+          key: "name",
+          header: "Nome",
+          render: (usuario) => <ClickableCell text={usuario.name} onClick={() => onEdit(usuario)} />
+        },
         { key: "email", header: "Email" },
         {
           key: "role",
@@ -34,13 +39,9 @@ export function UsuarioList({ usuarios, onEdit, onRemove }: UsuarioListProps) {
           key: "acoes",
           header: "Ações",
           render: (usuario) => (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => onEdit(usuario)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => onRemove(usuario.id)}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            <div className="flex justify-end gap-2">
+              <Button variant="danger" size="sm" onClick={() => onRemove(usuario.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
                 Desativar
               </Button>
             </div>

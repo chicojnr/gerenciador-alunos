@@ -15,7 +15,7 @@ describe("ResponsavelList", () => {
 
     expect(screen.getByText("Mae Fulana")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Mae Fulana"));
     expect(onEdit).toHaveBeenCalledWith(responsaveis[0]);
 
     fireEvent.click(screen.getByText("Remover"));

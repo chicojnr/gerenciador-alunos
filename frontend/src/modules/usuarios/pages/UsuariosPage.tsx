@@ -76,6 +76,7 @@ export function UsuariosPage() {
           initial={editing ? { name: editing.name, email: editing.email, role: editing.role } : undefined}
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
     </div>

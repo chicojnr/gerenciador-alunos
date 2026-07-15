@@ -82,7 +82,7 @@ export function DiasNaoLetivosPage() {
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <DiaNaoLetivoForm onSubmit={handleSubmit} />
+        <DiaNaoLetivoForm onSubmit={handleSubmit} onCancel={() => setModalOpen(false)} />
       </Modal>
     </div>
   );

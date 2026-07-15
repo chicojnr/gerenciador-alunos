@@ -23,7 +23,7 @@ describe("CalendarioLetivoList", () => {
     expect(screen.getByText("Ano Letivo 2026")).toBeTruthy();
     expect(screen.getByText("Escola A")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Ano Letivo 2026"));
     expect(onEdit).toHaveBeenCalledWith(calendarios[0]);
 
     fireEvent.click(screen.getByText("Remover"));

@@ -23,7 +23,7 @@ describe("ProfessorList", () => {
     expect(screen.getByText("Fulano")).toBeTruthy();
     expect(screen.getByText("Escola A")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Fulano"));
     expect(onEdit).toHaveBeenCalledWith(professores[0]);
 
     fireEvent.click(screen.getByText("Remover"));

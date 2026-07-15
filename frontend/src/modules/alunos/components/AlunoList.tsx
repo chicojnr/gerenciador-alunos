@@ -1,6 +1,7 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Table } from "../../../shared/components/Table.js";
 import { Button } from "../../../shared/components/Button.js";
+import { ClickableCell } from "../../../shared/components/ClickableCell.js";
 import type { Aluno } from "../types.js";
 
 interface AlunoListProps {
@@ -13,20 +14,20 @@ export function AlunoList({ alunos, onEdit, onRemove }: AlunoListProps) {
   return (
     <Table<Aluno>
       columns={[
-        { key: "nome", header: "Nome" },
+        {
+          key: "nome",
+          header: "Nome",
+          render: (aluno) => <ClickableCell text={aluno.nome} onClick={() => onEdit(aluno)} />
+        },
         { key: "turma", header: "Turma", render: (aluno) => aluno.turma.nome },
         { key: "situacaoAtual", header: "Situação", render: (aluno) => aluno.situacaoAtual.nome },
         {
           key: "acoes",
           header: "Ações",
           render: (aluno) => (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => onEdit(aluno)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => onRemove(aluno.id)}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            <div className="flex justify-end gap-2">
+              <Button variant="danger" size="sm" onClick={() => onRemove(aluno.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
                 Remover
               </Button>
             </div>

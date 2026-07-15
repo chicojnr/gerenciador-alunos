@@ -25,7 +25,7 @@ describe("IndicadorList", () => {
     expect(screen.getByText("3 dias seguidos")).toBeTruthy();
     expect(screen.getByText("3 dias consecutivos")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("3 dias seguidos"));
     expect(onEdit).toHaveBeenCalledWith(indicadores[0]);
 
     fireEvent.click(screen.getByText("Remover"));

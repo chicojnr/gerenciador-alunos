@@ -24,7 +24,7 @@ describe("TurmaList", () => {
     expect(screen.getByText("Escola A")).toBeTruthy();
     expect(screen.getByText("Diurno")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Turma A"));
     expect(onEdit).toHaveBeenCalledWith(turmas[0]);
 
     fireEvent.click(screen.getByText("Remover"));

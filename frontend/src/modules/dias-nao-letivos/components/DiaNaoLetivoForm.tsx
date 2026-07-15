@@ -4,12 +4,13 @@ import type { CreateDiaNaoLetivoInput, TipoDiaNaoLetivo } from "../types.js";
 
 interface DiaNaoLetivoFormProps {
   onSubmit: (data: CreateDiaNaoLetivoInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
   "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
-export function DiaNaoLetivoForm({ onSubmit }: DiaNaoLetivoFormProps) {
+export function DiaNaoLetivoForm({ onSubmit, onCancel }: DiaNaoLetivoFormProps) {
   const [data, setData] = useState("");
   const [tipo, setTipo] = useState<TipoDiaNaoLetivo>("FERIADO");
   const [descricao, setDescricao] = useState("");
@@ -51,7 +52,12 @@ export function DiaNaoLetivoForm({ onSubmit }: DiaNaoLetivoFormProps) {
         placeholder="Descrição (opcional)"
         className={INPUT_CLASSES}
       />
-      <Button type="submit">Adicionar</Button>
+      <div className="flex gap-2">
+        <Button type="submit">Adicionar</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

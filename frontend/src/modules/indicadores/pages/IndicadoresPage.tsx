@@ -119,6 +119,7 @@ export function IndicadoresPage() {
             }
             submitLabel={editing ? "Salvar" : "Adicionar"}
             onSubmit={handleSubmit}
+            onCancel={() => setModalOpen(false)}
           />
         )}
       </Modal>

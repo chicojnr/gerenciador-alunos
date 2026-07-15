@@ -90,10 +90,15 @@ export function EnviarMensagemModal({ open, onClose, alunoIds }: EnviarMensagemM
               </option>
             ))}
           </select>
-          <Button onClick={handleSend} disabled={!templateId || sending} className="w-full">
-            <Send className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
-            {sending ? "Enviando..." : "Enviar"}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleSend} disabled={!templateId || sending} className="w-full">
+              <Send className="mr-1.5 h-4 w-4" strokeWidth={2.25} />
+              {sending ? "Enviando..." : "Enviar"}
+            </Button>
+            <Button variant="secondary" onClick={handleClose} className="w-full">
+              Cancelar
+            </Button>
+          </div>
           {error && (
             <p role="alert" className="text-sm text-red-600">
               {error}

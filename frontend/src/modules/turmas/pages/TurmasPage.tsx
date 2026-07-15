@@ -85,6 +85,7 @@ export function TurmasPage() {
           }
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
         {editing && <TurmaMateriaPanel turmaId={editing.id} />}
       </Modal>

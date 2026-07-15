@@ -7,12 +7,13 @@ interface UsuarioFormProps {
   initial?: { name: string; email: string; role: Role };
   submitLabel: string;
   onSubmit: (data: CreateUsuarioInput | UpdateUsuarioInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
   "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
-export function UsuarioForm({ mode, initial, submitLabel, onSubmit }: UsuarioFormProps) {
+export function UsuarioForm({ mode, initial, submitLabel, onSubmit, onCancel }: UsuarioFormProps) {
   const [name, setName] = useState(initial?.name ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
   const [password, setPassword] = useState("");
@@ -64,7 +65,12 @@ export function UsuarioForm({ mode, initial, submitLabel, onSubmit }: UsuarioFor
         <option value="USER">Usuário</option>
         <option value="ADMIN">Admin</option>
       </select>
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

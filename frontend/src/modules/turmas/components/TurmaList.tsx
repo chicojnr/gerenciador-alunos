@@ -1,6 +1,7 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Table } from "../../../shared/components/Table.js";
 import { Button } from "../../../shared/components/Button.js";
+import { ClickableCell } from "../../../shared/components/ClickableCell.js";
 import type { Turma } from "../types.js";
 
 interface TurmaListProps {
@@ -13,7 +14,11 @@ export function TurmaList({ turmas, onEdit, onRemove }: TurmaListProps) {
   return (
     <Table<Turma>
       columns={[
-        { key: "nome", header: "Nome" },
+        {
+          key: "nome",
+          header: "Nome",
+          render: (turma) => <ClickableCell text={turma.nome} onClick={() => onEdit(turma)} />
+        },
         { key: "serie", header: "Série" },
         { key: "escola", header: "Escola", render: (turma) => turma.escola.nome },
         { key: "periodo", header: "Período", render: (turma) => turma.periodo.nome },
@@ -21,13 +26,9 @@ export function TurmaList({ turmas, onEdit, onRemove }: TurmaListProps) {
           key: "acoes",
           header: "Ações",
           render: (turma) => (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => onEdit(turma)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => onRemove(turma.id)}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            <div className="flex justify-end gap-2">
+              <Button variant="danger" size="sm" onClick={() => onRemove(turma.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
                 Remover
               </Button>
             </div>

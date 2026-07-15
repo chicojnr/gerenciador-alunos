@@ -17,7 +17,7 @@ describe("UsuarioList", () => {
     expect(screen.getByText("fulano@example.com")).toBeTruthy();
     expect(screen.getByText("Usuário")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Fulano"));
     expect(onEdit).toHaveBeenCalledWith(usuarios[0]);
 
     fireEvent.click(screen.getByText("Desativar"));

@@ -15,7 +15,7 @@ describe("EscolaList", () => {
 
     expect(screen.getByText("Escola A")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Escola A"));
     expect(onEdit).toHaveBeenCalledWith(escolas[0]);
 
     fireEvent.click(screen.getByText("Remover"));

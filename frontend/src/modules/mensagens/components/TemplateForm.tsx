@@ -6,12 +6,13 @@ interface TemplateFormProps {
   initial?: CreateTemplateInput;
   submitLabel: string;
   onSubmit: (data: CreateTemplateInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
   "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
-export function TemplateForm({ initial, submitLabel, onSubmit }: TemplateFormProps) {
+export function TemplateForm({ initial, submitLabel, onSubmit, onCancel }: TemplateFormProps) {
   const [nome, setNome] = useState(initial?.nome ?? "");
   const [conteudo, setConteudo] = useState(initial?.conteudo ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +49,12 @@ export function TemplateForm({ initial, submitLabel, onSubmit }: TemplateFormPro
       <p className="text-xs text-zinc-400">
         Variáveis disponíveis: <code>{"{aluno}"}</code> e <code>{"{responsavel}"}</code>
       </p>
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

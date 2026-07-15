@@ -8,6 +8,7 @@ interface ResponsavelComunicacaoFormProps {
   initial?: CreateResponsavelComunicacaoInput;
   submitLabel: string;
   onSubmit: (data: CreateResponsavelComunicacaoInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
@@ -16,7 +17,8 @@ const INPUT_CLASSES =
 export function ResponsavelComunicacaoForm({
   initial,
   submitLabel,
-  onSubmit
+  onSubmit,
+  onCancel
 }: ResponsavelComunicacaoFormProps) {
   const { escolas, loading: loadingEscolas } = useEscolaOptions();
   const { usuarios, loading: loadingUsuarios } = useUsuarioOptions();
@@ -74,7 +76,12 @@ export function ResponsavelComunicacaoForm({
           </option>
         ))}
       </select>
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

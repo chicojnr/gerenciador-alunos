@@ -75,6 +75,7 @@ export function SituacoesAlunoPage() {
           initial={editing ? { nome: editing.nome } : undefined}
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
     </div>

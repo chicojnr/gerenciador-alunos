@@ -25,10 +25,12 @@ export function DiaNaoLetivoList({ dias, onRemove }: DiaNaoLetivoListProps) {
           key: "acoes",
           header: "Ações",
           render: (d) => (
-            <Button variant="danger" onClick={() => onRemove(d.id)}>
-              <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-              Remover
-            </Button>
+            <div className="flex justify-end">
+              <Button variant="danger" size="sm" onClick={() => onRemove(d.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
+                Remover
+              </Button>
+            </div>
           )
         }
       ]}

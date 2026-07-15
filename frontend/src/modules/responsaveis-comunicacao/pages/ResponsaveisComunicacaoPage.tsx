@@ -83,6 +83,7 @@ export function ResponsaveisComunicacaoPage() {
           }
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
     </div>

@@ -13,7 +13,7 @@ describe("PeriodoList", () => {
 
     expect(screen.getByText("Diurno")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Diurno"));
     expect(onEdit).toHaveBeenCalledWith(periodos[0]);
 
     fireEvent.click(screen.getByText("Remover"));

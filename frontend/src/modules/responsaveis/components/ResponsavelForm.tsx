@@ -6,12 +6,18 @@ interface ResponsavelFormProps {
   initial?: CreateResponsavelInput;
   submitLabel: string;
   onSubmit: (data: CreateResponsavelInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
   "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
-export function ResponsavelForm({ initial, submitLabel, onSubmit }: ResponsavelFormProps) {
+export function ResponsavelForm({
+  initial,
+  submitLabel,
+  onSubmit,
+  onCancel
+}: ResponsavelFormProps) {
   const [nome, setNome] = useState(initial?.nome ?? "");
   const [telefone, setTelefone] = useState(initial?.telefone ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
@@ -53,7 +59,12 @@ export function ResponsavelForm({ initial, submitLabel, onSubmit }: ResponsavelF
         placeholder="Email (opcional)"
         className={INPUT_CLASSES}
       />
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

@@ -1,6 +1,7 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Table } from "../../../shared/components/Table.js";
 import { Button } from "../../../shared/components/Button.js";
+import { ClickableCell } from "../../../shared/components/ClickableCell.js";
 import type { Template } from "../types.js";
 
 interface TemplateListProps {
@@ -13,7 +14,11 @@ export function TemplateList({ templates, onEdit, onRemove }: TemplateListProps)
   return (
     <Table<Template>
       columns={[
-        { key: "nome", header: "Nome" },
+        {
+          key: "nome",
+          header: "Nome",
+          render: (t) => <ClickableCell text={t.nome} onClick={() => onEdit(t)} />
+        },
         {
           key: "conteudo",
           header: "Conteúdo",
@@ -23,13 +28,9 @@ export function TemplateList({ templates, onEdit, onRemove }: TemplateListProps)
           key: "acoes",
           header: "Ações",
           render: (template) => (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => onEdit(template)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => onRemove(template.id)}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            <div className="flex justify-end gap-2">
+              <Button variant="danger" size="sm" onClick={() => onRemove(template.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
                 Remover
               </Button>
             </div>

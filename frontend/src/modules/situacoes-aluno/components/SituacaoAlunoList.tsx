@@ -1,6 +1,7 @@
-import { Pencil, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { Table } from "../../../shared/components/Table.js";
 import { Button } from "../../../shared/components/Button.js";
+import { ClickableCell } from "../../../shared/components/ClickableCell.js";
 import type { SituacaoAluno } from "../types.js";
 
 interface SituacaoAlunoListProps {
@@ -13,18 +14,20 @@ export function SituacaoAlunoList({ situacoes, onEdit, onRemove }: SituacaoAluno
   return (
     <Table<SituacaoAluno>
       columns={[
-        { key: "nome", header: "Nome" },
+        {
+          key: "nome",
+          header: "Nome",
+          render: (situacao) => (
+            <ClickableCell text={situacao.nome} onClick={() => onEdit(situacao)} />
+          )
+        },
         {
           key: "acoes",
           header: "Ações",
           render: (situacao) => (
-            <div className="flex gap-2">
-              <Button variant="secondary" onClick={() => onEdit(situacao)}>
-                <Pencil className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
-                Editar
-              </Button>
-              <Button variant="danger" onClick={() => onRemove(situacao.id)}>
-                <Trash2 className="mr-1.5 h-3.5 w-3.5" strokeWidth={2} />
+            <div className="flex justify-end gap-2">
+              <Button variant="danger" size="sm" onClick={() => onRemove(situacao.id)}>
+                <Trash2 className="mr-1 h-3 w-3" strokeWidth={2} />
                 Remover
               </Button>
             </div>

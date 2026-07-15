@@ -7,12 +7,13 @@ interface ProfessorFormProps {
   initial?: CreateProfessorInput;
   submitLabel: string;
   onSubmit: (data: CreateProfessorInput) => Promise<void>;
+  onCancel: () => void;
 }
 
 const INPUT_CLASSES =
   "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm focus:border-indigo-600 focus:outline-none focus:ring-1 focus:ring-indigo-600";
 
-export function ProfessorForm({ initial, submitLabel, onSubmit }: ProfessorFormProps) {
+export function ProfessorForm({ initial, submitLabel, onSubmit, onCancel }: ProfessorFormProps) {
   const { escolas, loading: loadingEscolas } = useEscolaOptions();
   const [nome, setNome] = useState(initial?.nome ?? "");
   const [email, setEmail] = useState(initial?.email ?? "");
@@ -70,7 +71,12 @@ export function ProfessorForm({ initial, submitLabel, onSubmit }: ProfessorFormP
           </option>
         ))}
       </select>
-      <Button type="submit">{submitLabel}</Button>
+      <div className="flex gap-2">
+        <Button type="submit">{submitLabel}</Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
       {error && (
         <p role="alert" className="text-sm text-red-600">
           {error}

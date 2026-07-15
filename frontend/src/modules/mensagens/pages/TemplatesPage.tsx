@@ -83,6 +83,7 @@ export function TemplatesPage() {
           initial={editing ? { nome: editing.nome, conteudo: editing.conteudo } : undefined}
           submitLabel={editing ? "Salvar" : "Adicionar"}
           onSubmit={handleSubmit}
+          onCancel={() => setModalOpen(false)}
         />
       </Modal>
     </div>

@@ -15,7 +15,7 @@ describe("TemplateList", () => {
 
     expect(screen.getByText("Alerta")).toBeTruthy();
 
-    fireEvent.click(screen.getByText("Editar"));
+    fireEvent.click(screen.getByText("Alerta"));
     expect(onEdit).toHaveBeenCalledWith(templates[0]);
 
     fireEvent.click(screen.getByText("Remover"));
